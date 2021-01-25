@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://src/resources/tiles/tile.gd" type="Script" id=1]
+[ext_resource path="res://src/resources/tiles/blueprint_placement.gd" type="Script" id=2]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 2 )
+tile_name = "main_thruster"
+is_background = false
+
+[resource]
+script = ExtResource( 1 )
+id = 2
+pretty_name = "Thruster"
+blueprint_placement = SubResource( 1 )

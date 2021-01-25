@@ -8,9 +8,26 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Resource",
+"class": "BlueprintPlacement",
+"language": "GDScript",
+"path": "res://src/resources/tiles/blueprint_placement.gd"
+}, {
+"base": "Resource",
+"class": "ShipPlacement",
+"language": "GDScript",
+"path": "res://src/resources/tiles/ship_placement.gd"
+}, {
+"base": "Resource",
+"class": "Tile",
+"language": "GDScript",
+"path": "res://src/resources/tiles/tile.gd"
+} ]
 _global_script_class_icons={
-
+"BlueprintPlacement": "",
+"ShipPlacement": "",
+"Tile": ""
 }
 
 [application]
@@ -18,10 +35,18 @@ _global_script_class_icons={
 config/name="SPB"
 config/icon="res://icon.png"
 
+[display]
+
+window/stretch/mode="viewport"
+window/stretch/aspect="expand"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
 [rendering]
 
 quality/driver/driver_name="GLES2"
 vram_compression/import_etc=true
 vram_compression/import_etc2=false
-environment/default_clear_color=Color( 0.0666667, 0.0352941, 0.192157, 1 )
 environment/default_environment="res://default_env.tres"

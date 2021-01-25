@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://scenes/ship_builder/ui.tscn" type="PackedScene" id=1]
+[ext_resource path="res://scenes/ship_builder/blueprint.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/ship_builder/ship_builder.gd" type="Script" id=3]
+
+[node name="ShipBuilder" type="Node"]
+script = ExtResource( 3 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -101
+
+[node name="Background" type="ColorRect" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color( 0.247059, 0.247059, 0.454902, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Blueprint" parent="." instance=ExtResource( 2 )]
+
+[node name="UI" parent="." instance=ExtResource( 1 )]
