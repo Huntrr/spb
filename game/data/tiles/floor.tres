@@ -6,7 +6,7 @@
 [sub_resource type="Resource" id=1]
 script = ExtResource( 2 )
 tile_name = "floor"
-is_background = true
+placement_type = 0
 
 [resource]
 script = ExtResource( 1 )

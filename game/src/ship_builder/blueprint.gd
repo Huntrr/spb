@@ -51,12 +51,15 @@ func _set_placing(new_placing: bool) -> void:
 	var tile_coord: Vector2 = construct.world_to_map(get_local_mouse_position())
 	if current_tile != null:
 		var tile_id: int = current_tile.blueprint_placement.tile_id
-		var is_background: bool = current_tile.blueprint_placement.is_background
+		print(current_tile.blueprint_placement.placement_type)
+		var is_background: bool = (
+			current_tile.blueprint_placement.placement_type == \
+			BlueprintPlacement.PlacementType.BACKGROUND)
 		if placing:
 			if not new_placing:
 				# User is releasing their mouse button.
 				var tilemap: TileMap
-				if current_tile.blueprint_placement.is_background:
+				if is_background:
 					tilemap = background
 				else:
 					tilemap = objects

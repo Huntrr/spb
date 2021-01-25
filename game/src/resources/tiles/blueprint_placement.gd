@@ -6,7 +6,14 @@ const tileset: TileSet = (
 	preload("res://assets/tiles/blueprint/tileset.tres"))
 
 export(String) var tile_name setget _set_tile_name
-export(bool) var is_background
+
+enum PlacementType {
+	BACKGROUND,
+	INSIDE_ONY,
+	OUTSIDE_ONLY,
+	BOTH
+}
+export(PlacementType) var placement_type
 
 var tile_id: int
 var tile_texture: Texture
