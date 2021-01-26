@@ -1,7 +1,7 @@
 extends TabContainer
 # Allows users to select from a collection of separate tiles.
 
-signal tile_selected(tile)
+signal tile_selected(tile, rotation)
 
 export(Array) var tiles
 
@@ -36,12 +36,12 @@ func _ready() -> void:
 			button.connect("tile_selected", self, "_on_tile_selected")
 
 
-func _on_tile_selected(tile: Tile) -> void:
+func _on_tile_selected(tile: Tile, rotation: int) -> void:
 	if _selected_tile != null:
 		_buttons[_selected_tile.id].active = false
 	_selected_tile = tile
 	_buttons[_selected_tile.id].active = true
-	emit_signal("tile_selected", tile)
+	emit_signal("tile_selected", tile, rotation)
 
 
 func _mk_section_container(parent: Node, title: String) -> HBoxContainer:
@@ -54,7 +54,6 @@ func _mk_section_container(parent: Node, title: String) -> HBoxContainer:
 func _mk_button(parent: Node, tile: Tile) -> Node:
 	var button = SelectTileButton.instance().init(tile)
 	var subcontainer := _mk_section_subcontainer(parent)
-	parent.add_child(subcontainer)
 	subcontainer.add_child(button)
 	return button
 

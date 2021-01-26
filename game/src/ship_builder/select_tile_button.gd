@@ -1,7 +1,7 @@
 extends Control
 # Controls a single tile-selector button node.
 
-signal tile_selected(tile)
+signal tile_selected(tile, rotation)
 
 export(Resource) var tile
 
@@ -17,6 +17,8 @@ const active_style: StyleBox = (
 onready var texture_rect: TextureRect = $VBoxContainer/TextureRect
 onready var label: Label = $VBoxContainer/Label
 
+onready var rotation: int setget _set_rotation
+
 var active := false setget _set_active
 var hovered := false setget _set_hovered
 var focused := false setget _set_focused
@@ -31,6 +33,7 @@ func _ready() -> void:
 	label.set_text(tile.pretty_name)
 	texture_rect.set_texture(tile.blueprint_placement.tile_texture)
 	self.active = false
+	self.rotation = tile.blueprint_placement.default_rotation
 	
 	focus_mode = Control.FOCUS_ALL
 	
@@ -38,6 +41,8 @@ func _ready() -> void:
 	connect("mouse_exited", self, "_on_mouse_exit")
 	connect("focus_entered", self, "_on_focus_enter")
 	connect("focus_exited", self, "_on_focus_exit")
+	
+	get_tree().get_root().connect("size_changed", self, "_on_resize")
 
 
 func _gui_input(event):
@@ -54,8 +59,19 @@ func init(_tile: Tile) -> Node:
 	return self
 
 
+func _update() -> void:
+	texture_rect.rect_rotation = _get_yaw(rotation)
+	texture_rect.rect_pivot_offset = texture_rect.rect_size / 2
+
+
+func _on_resize() -> void:
+	update()
+
+
 func _on_click():
-	emit_signal("tile_selected", tile)
+	if active and tile.rotatable:
+		self.rotation = Rotation.next(rotation)
+	emit_signal("tile_selected", tile, rotation)
 
 
 func _on_mouse_enter():
@@ -100,3 +116,31 @@ func _set_active(new_active: bool):
 		add_stylebox_override("panel", active_style)
 	else:
 		_set_hovered(hovered)
+
+func _set_rotation(new_rotation: int):
+	rotation = new_rotation
+	_update()
+
+
+func _get_yaw(rot: int):
+	match rot:
+		Rotation.UP:
+			return 180
+		Rotation.RIGHT:
+			return 270
+		Rotation.DOWN:
+			return 0
+		Rotation.LEFT:
+			return 90
+
+
+func _get_pos(rot: int):
+	match rot:
+		Rotation.UP:
+			return Vector2(-1, -1)
+		Rotation.RIGHT:
+			return Vector2(0, -1)
+		Rotation.DOWN:
+			return Vector2(0, 0)
+		Rotation.LEFT:
+			return Vector2(-1, 0)

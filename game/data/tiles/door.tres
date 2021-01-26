@@ -6,10 +6,13 @@
 [sub_resource type="Resource" id=1]
 script = ExtResource( 2 )
 tile_name = "door"
-placement_type = 1
+is_background = false
+default_rotation = 2
+rotate_like_door = true
 
 [resource]
 script = ExtResource( 1 )
 id = 1
 pretty_name = "Door"
 blueprint_placement = SubResource( 1 )
+rotatable = false

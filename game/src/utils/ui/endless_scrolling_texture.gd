@@ -20,7 +20,6 @@ func update() -> void:
 func _reposition() -> void:
 	var global_rect := get_global_rect()
 	var screen_pos := global_rect.position
-	var size := global_rect.size
 	var left := screen_pos.x
 	var right := screen_pos.x + rect_size.x * scale.x
 	var top := screen_pos.y

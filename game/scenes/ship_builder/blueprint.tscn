@@ -1,13 +1,16 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://assets/tiles/blueprint/tileset.tres" type="TileSet" id=1]
 [ext_resource path="res://src/ship_builder/blueprint.gd" type="Script" id=2]
 [ext_resource path="res://assets/tiles/blueprint/background.png" type="Texture" id=3]
 [ext_resource path="res://src/utils/ui/endless_scrolling_texture.gd" type="Script" id=4]
+[ext_resource path="res://data/tiles/door.tres" type="Resource" id=5]
 
 [node name="Blueprint" type="Node2D"]
 scale = Vector2( 3, 3 )
 script = ExtResource( 2 )
+door_tile = ExtResource( 5 )
+sideways_tile_coord = Vector2( 4, 0 )
 
 [node name="Grid" type="TextureRect" parent="."]
 margin_right = 1.0

@@ -6,10 +6,13 @@
 [sub_resource type="Resource" id=1]
 script = ExtResource( 2 )
 tile_name = "main_thruster"
-placement_type = 2
+is_background = false
+default_rotation = 2
+rotate_like_door = false
 
 [resource]
 script = ExtResource( 1 )
 id = 2
 pretty_name = "Thruster"
 blueprint_placement = SubResource( 1 )
+rotatable = true

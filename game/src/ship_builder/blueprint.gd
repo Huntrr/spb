@@ -5,6 +5,11 @@ export(float) var zoom_amount = 1
 export(float) var min_zoom = 0.5
 export(float) var max_zoom = 10
 
+export(Resource) var door_tile
+export(Vector2) var sideways_tile_coord
+
+const DoorTileSet := preload("res://src/ship_builder/door_tile_set.gd")
+
 onready var grid = $Grid
 onready var background = $Layers/Background
 onready var objects = $Layers/Objects
@@ -12,12 +17,24 @@ onready var construct = $Layers/Construct
 
 var dragging := false
 var placing := false setget _set_placing
+var placing_coord: Vector2
+var placing_rotation: int
+
 var zoom := 3.0 setget _set_zoom
 var current_tile: Tile = null
+var current_tile_rotation: int
+
+
+func _get_configuration_warning() -> String:
+	if not (door_tile is Tile):
+		return "door_tile is not a Tile"
+	return ""
 
 
 func _ready() -> void:
 	zoom = scale.x
+	objects.tile_set.set_script(
+		DoorTileSet.new(door_tile, background, sideways_tile_coord))
 
 
 func _input(event: InputEvent) -> void:
@@ -36,37 +53,71 @@ func _unhandled_input(event: InputEvent) -> void:
 		self.zoom -= zoom_amount * event.delta.y
 	if event is InputEventMouse:
 		_update_construct()
+		_on_mouse_move()
 
 
 func _update_construct() -> void:
 	construct.clear()
-	var tile_coord: Vector2 = construct.world_to_map(get_local_mouse_position())
+	var mouse_coord: Vector2 = (
+		construct.world_to_map(get_local_mouse_position()))
+	var tile_coord: Vector2
+	var tile_rotation: int
+	
 	if current_tile != null:
-		var tile_id: int = current_tile.blueprint_placement.tile_id
-		construct.set_cellv(tile_coord, tile_id)
-		construct.update_bitmask_area(tile_coord)
+		if placing and current_tile.rotatable:
+			if mouse_coord.x == placing_coord.x:
+				if mouse_coord.y > placing_coord.y:
+					placing_rotation = Rotation.DOWN
+				elif mouse_coord.y < placing_coord.y:
+					placing_rotation = Rotation.UP
+			elif mouse_coord.y == placing_coord.y:
+				if mouse_coord.x > placing_coord.x:
+					placing_rotation = Rotation.RIGHT
+				elif mouse_coord.x < placing_coord.x:
+					placing_rotation = Rotation.LEFT
+		
+		if placing and not current_tile.blueprint_placement.is_background:
+			tile_rotation = placing_rotation
+			if not current_tile.blueprint_placement.is_background:
+				tile_coord = placing_coord
+		else:
+			tile_coord = mouse_coord
+			tile_rotation = current_tile_rotation
+			
+		_place_tile(construct, tile_coord, tile_rotation)
+
+func _on_mouse_move() -> void:
+	var tile_coord: Vector2 = construct.world_to_map(get_local_mouse_position())
+	if placing and current_tile != null:
+		if current_tile.blueprint_placement.is_background:
+			_place_tile(background, tile_coord, placing_rotation)
 
 
 func _set_placing(new_placing: bool) -> void:
-	var tile_coord: Vector2 = construct.world_to_map(get_local_mouse_position())
 	if current_tile != null:
-		var tile_id: int = current_tile.blueprint_placement.tile_id
-		print(current_tile.blueprint_placement.placement_type)
-		var is_background: bool = (
-			current_tile.blueprint_placement.placement_type == \
-			BlueprintPlacement.PlacementType.BACKGROUND)
-		if placing:
-			if not new_placing:
+		if not current_tile.blueprint_placement.is_background:
+			if not placing and new_placing:
+				# User is pressing their mouse button.
+				placing_coord = construct.world_to_map(get_local_mouse_position())
+				placing_rotation = current_tile_rotation
+			elif placing and not new_placing:
 				# User is releasing their mouse button.
-				var tilemap: TileMap
-				if is_background:
-					tilemap = background
-				else:
-					tilemap = objects
-				tilemap.set_cellv(tile_coord, tile_id)
-				tilemap.update_bitmask_area(tile_coord)
-				
+				_place_tile(objects, placing_coord, placing_rotation)
+		else:
+			if not placing and new_placing:
+				placing_rotation = current_tile_rotation
+			
 	placing = new_placing
+
+
+func _place_tile(tilemap: TileMap, coord: Vector2, rot: int):
+	var id = current_tile.blueprint_placement.tile_id
+	
+	var flip_x := rot == Rotation.LEFT or rot == Rotation.UP
+	var flip_y := rot == Rotation.UP
+	var transpose := rot == Rotation.LEFT or rot == Rotation.RIGHT
+	tilemap.set_cellv(coord, id, flip_x, flip_y, transpose)
+	tilemap.update_bitmask_area(coord)
 
 
 func _set_zoom(new_zoom: float) -> void:

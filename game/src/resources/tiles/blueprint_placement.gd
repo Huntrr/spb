@@ -7,13 +7,9 @@ const tileset: TileSet = (
 
 export(String) var tile_name setget _set_tile_name
 
-enum PlacementType {
-	BACKGROUND,
-	INSIDE_ONY,
-	OUTSIDE_ONLY,
-	BOTH
-}
-export(PlacementType) var placement_type
+export(bool) var is_background
+export(int, "Up", "Right", "Down", "Left") var default_rotation = 2
+export(bool) var rotate_like_door 
 
 var tile_id: int
 var tile_texture: Texture
