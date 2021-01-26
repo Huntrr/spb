@@ -8,8 +8,6 @@ export(float) var max_zoom = 10
 export(Resource) var door_tile
 export(Vector2) var sideways_tile_coord
 
-const DoorTileSet := preload("res://src/ship_builder/door_tile_set.gd")
-
 onready var grid = $Grid
 onready var background = $Layers/Background
 onready var objects = $Layers/Objects
@@ -33,8 +31,10 @@ func _get_configuration_warning() -> String:
 
 func _ready() -> void:
 	zoom = scale.x
-	objects.tile_set.set_script(
-		DoorTileSet.new(door_tile, background, sideways_tile_coord))
+	objects.tile_set.background = background
+	objects.tile_set.door_tile = door_tile
+	objects.tile_set.sideways_tile_coord = sideways_tile_coord
+	objects.tile_set.active = true
 
 
 func _input(event: InputEvent) -> void:
@@ -117,7 +117,9 @@ func _place_tile(tilemap: TileMap, coord: Vector2, rot: int):
 	var flip_y := rot == Rotation.UP
 	var transpose := rot == Rotation.LEFT or rot == Rotation.RIGHT
 	tilemap.set_cellv(coord, id, flip_x, flip_y, transpose)
-	tilemap.update_bitmask_area(coord)
+	
+	for tm in [background, objects, construct]:
+		tm.update_bitmask_region(coord - Vector2(1, 1), coord + Vector2(1, 1))
 
 
 func _set_zoom(new_zoom: float) -> void:
