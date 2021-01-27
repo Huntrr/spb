@@ -13,7 +13,7 @@ onready var background = $Layers/Background
 onready var objects = $Layers/Objects
 onready var construct = $Layers/Construct
 
-var dragging := false
+var dragging := false setget _set_dragging
 var placing := false setget _set_placing
 var placing_coord: Vector2
 var placing_rotation: int
@@ -21,6 +21,8 @@ var placing_rotation: int
 var zoom := 3.0 setget _set_zoom
 var current_tile: Tile = null
 var current_tile_rotation: int
+
+var drag_did_move := false
 
 
 func _get_configuration_warning() -> String:
@@ -40,6 +42,7 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if dragging and event is InputEventMouseMotion:
 		translate(event.relative)
+		drag_did_move = true
 		grid.update()
 
 
@@ -54,6 +57,39 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouse:
 		_update_construct()
 		_on_mouse_move()
+
+
+func center() -> void:
+	# Centers the current blueprint on screen.
+	var used_rect_bg: Rect2 = background.get_used_rect()
+	var used_rect_obj: Rect2 = objects.get_used_rect()
+	var used_rect: Rect2 = used_rect_bg.merge(used_rect_obj)
+	
+	var start: Vector2 = construct.map_to_world(used_rect.position)
+	var end: Vector2 = construct.map_to_world(used_rect.end)
+	var center: Vector2 = (start + end) / 2
+	
+	self.zoom = 3.0
+	set_global_position(-center)
+	grid.update()
+	_update_construct()
+
+
+func place_tile(tilemap: TileMap, coord: Vector2, tile: Tile, rot: int):
+	var id = tile.blueprint_placement.tile_id
+	
+	var flip_x := rot == Rotation.LEFT or rot == Rotation.UP
+	var flip_y := rot == Rotation.UP or rot == Rotation.RIGHT
+	var transpose := rot == Rotation.LEFT or rot == Rotation.RIGHT
+	
+	if id == -1 and tilemap != construct:
+		for tm in [background, objects]:
+			tm.set_cellv(coord, -1)
+	else:
+		tilemap.set_cellv(coord, id, flip_x, flip_y, transpose)
+	
+	for tm in [background, objects, construct]:
+		tm.update_bitmask_region(coord - Vector2(1, 1), coord + Vector2(1, 1))
 
 
 func _update_construct() -> void:
@@ -111,12 +147,11 @@ func _set_placing(new_placing: bool) -> void:
 
 
 func _place_tile(tilemap: TileMap, coord: Vector2, rot: int):
-	var id = current_tile.blueprint_placement.tile_id
-	
-	var flip_x := rot == Rotation.LEFT or rot == Rotation.UP
-	var flip_y := rot == Rotation.UP
-	var transpose := rot == Rotation.LEFT or rot == Rotation.RIGHT
-	tilemap.set_cellv(coord, id, flip_x, flip_y, transpose)
+	place_tile(tilemap, coord, current_tile, rot)
+
+
+func _remove_tile(tilemap: TileMap, coord: Vector2):
+	tilemap.set_cellv(coord, -1)
 	
 	for tm in [background, objects, construct]:
 		tm.update_bitmask_region(coord - Vector2(1, 1), coord + Vector2(1, 1))
@@ -129,3 +164,14 @@ func _set_zoom(new_zoom: float) -> void:
 	var post_mouse_pos := get_local_mouse_position()
 	translate((post_mouse_pos - pre_mouse_pos) * scale)
 	grid.update()
+
+
+func _set_dragging(new_dragging: bool) -> void:
+	if not dragging and new_dragging:
+		drag_did_move = false
+	elif dragging and not new_dragging:
+		if not drag_did_move:
+			var coord: Vector2 = (
+				construct.world_to_map(get_local_mouse_position()))
+			_remove_tile(objects, coord)
+	dragging = new_dragging

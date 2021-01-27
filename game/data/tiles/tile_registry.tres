@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=5 format=2]
+
+[ext_resource path="res://src/resources/tiles/tile_registry.gd" type="Script" id=1]
+[ext_resource path="res://data/tiles/floor.tres" type="Resource" id=2]
+[ext_resource path="res://data/tiles/main_thruster.tres" type="Resource" id=3]
+[ext_resource path="res://data/tiles/door.tres" type="Resource" id=4]
+
+[resource]
+script = ExtResource( 1 )
+tiles = [ ExtResource( 2 ), ExtResource( 4 ), ExtResource( 3 ) ]

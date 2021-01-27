@@ -1,12 +1,91 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://scenes/ship_builder/tile_selector.tscn" type="PackedScene" id=1]
+[ext_resource path="res://data/tiles/door.tres" type="Resource" id=2]
+[ext_resource path="res://data/tiles/floor.tres" type="Resource" id=3]
+[ext_resource path="res://data/tiles/main_thruster.tres" type="Resource" id=4]
+[ext_resource path="res://data/tiles/void.tres" type="Resource" id=5]
+[ext_resource path="res://assets/ui/blueprint/load_normal.png" type="Texture" id=6]
+[ext_resource path="res://assets/ui/blueprint/play_hover.png" type="Texture" id=7]
+[ext_resource path="res://assets/ui/blueprint/play_normal.png" type="Texture" id=8]
+[ext_resource path="res://assets/ui/blueprint/save_normal.png" type="Texture" id=9]
+[ext_resource path="res://assets/ui/blueprint/load_hover.png" type="Texture" id=10]
+[ext_resource path="res://assets/ui/blueprint/save_active.png" type="Texture" id=11]
+[ext_resource path="res://assets/ui/blueprint/load_active.png" type="Texture" id=12]
+[ext_resource path="res://assets/ui/blueprint/save_hover.png" type="Texture" id=13]
+[ext_resource path="res://assets/ui/blueprint/play_active.png" type="Texture" id=14]
+
+[sub_resource type="InputEventAction" id=1]
+action = "ui_save"
+
+[sub_resource type="ShortCut" id=2]
+shortcut = SubResource( 1 )
+
+[sub_resource type="InputEventAction" id=3]
+action = "ui_play"
+
+[sub_resource type="ShortCut" id=4]
+shortcut = SubResource( 3 )
+
+[sub_resource type="InputEventAction" id=5]
+action = "ui_load"
+
+[sub_resource type="ShortCut" id=6]
+shortcut = SubResource( 5 )
+
+[sub_resource type="GDScript" id=7]
+script/source = "extends FileDialog
+
+
+const DIR_PREFIX = \"user://blueprints/\"
+
+
+func _ready() -> void:
+	var dir = Directory.new()
+	dir.open(\"user://\")
+	dir.make_dir(\"blueprints\")
+	
+	connect(\"dir_selected\", self, \"_on_dir_selected\")
+
+
+func _process(delta: float) -> void:
+	if not current_dir.begins_with(DIR_PREFIX):
+		current_dir = DIR_PREFIX
+
+
+func _on_save_pressed() -> void:
+	current_dir = DIR_PREFIX
+	popup()
+"
+
+[sub_resource type="GDScript" id=8]
+script/source = "extends FileDialog
+
+
+const DIR_PREFIX = \"user://blueprints/\"
+
+
+func _ready() -> void:
+	var dir = Directory.new()
+	dir.open(\"user://\")
+	dir.make_dir(\"blueprints\")
+	
+	connect(\"dir_selected\", self, \"_on_dir_selected\")
+
+
+func _process(delta: float) -> void:
+	if not current_dir.begins_with(DIR_PREFIX):
+		current_dir = DIR_PREFIX
+
+
+func _on_load_pressed() -> void:
+	current_dir = DIR_PREFIX
+	popup()
+"
 
 [node name="UI" type="Control"]
-anchor_left = -0.000745416
-anchor_top = 0.00127223
-anchor_right = 0.999255
-anchor_bottom = 1.00127
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 0.763306
 margin_top = -0.763336
 margin_right = 0.762878
@@ -17,3 +96,88 @@ __meta__ = {
 }
 
 [node name="TileSelector" parent="." instance=ExtResource( 1 )]
+tiles = [ [ "Core", [ ExtResource( 5 ), ExtResource( 3 ), ExtResource( 2 ), ExtResource( 4 ) ] ], [ "Battle Stations", [  ] ], [ "Space Station", [  ] ] ]
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchor_right = 1.0
+margin_bottom = 30.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer"]
+margin_left = 451.0
+margin_right = 571.0
+margin_bottom = 45.0
+custom_constants/margin_top = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/MarginContainer"]
+margin_top = 5.0
+margin_right = 120.0
+margin_bottom = 45.0
+custom_constants/separation = 0
+
+[node name="SaveButton" type="TextureButton" parent="CenterContainer/MarginContainer/HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+shortcut = SubResource( 2 )
+texture_normal = ExtResource( 9 )
+texture_pressed = ExtResource( 11 )
+texture_hover = ExtResource( 13 )
+
+[node name="PlayButton" type="TextureButton" parent="CenterContainer/MarginContainer/HBoxContainer"]
+margin_left = 40.0
+margin_right = 80.0
+margin_bottom = 40.0
+shortcut = SubResource( 4 )
+texture_normal = ExtResource( 8 )
+texture_pressed = ExtResource( 14 )
+texture_hover = ExtResource( 7 )
+
+[node name="LoadButton" type="TextureButton" parent="CenterContainer/MarginContainer/HBoxContainer"]
+margin_left = 80.0
+margin_right = 120.0
+margin_bottom = 40.0
+shortcut = SubResource( 6 )
+texture_normal = ExtResource( 6 )
+texture_pressed = ExtResource( 12 )
+texture_hover = ExtResource( 10 )
+
+[node name="SaveDialog" type="FileDialog" parent="."]
+anchor_left = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.7
+margin_top = 50.0
+rect_min_size = Vector2( 400, 140 )
+window_title = "Save Blueprint"
+resizable = true
+mode_overrides_title = false
+access = 1
+filters = PoolStringArray( "*.spb ; blueprint" )
+current_dir = "user://"
+current_path = "user://"
+script = SubResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LoadDialog" type="FileDialog" parent="."]
+anchor_left = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.7
+margin_top = 50.0
+rect_min_size = Vector2( 400, 140 )
+window_title = "Load Blueprint"
+resizable = true
+mode_overrides_title = false
+mode = 0
+access = 1
+filters = PoolStringArray( "*.spb ; blueprint" )
+current_dir = "user://"
+current_path = "user://"
+script = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="CenterContainer/MarginContainer/HBoxContainer/SaveButton" to="SaveDialog" method="_on_save_pressed"]
+[connection signal="pressed" from="CenterContainer/MarginContainer/HBoxContainer/LoadButton" to="LoadDialog" method="_on_load_pressed"]

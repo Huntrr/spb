@@ -27,9 +27,7 @@ func _forward_subtile_selection(autotile_id, bitmask, tilemap, coord):
 			background.get_cellv(coord + Vector2.DOWN) != TileMap.INVALID_CELL)
 		var has_right: bool = (
 			background.get_cellv(coord + Vector2.RIGHT) != TileMap.INVALID_CELL)
-		print("2")
 		if (not has_left or not has_right) and (has_up and has_down):
-			print("3")
 			return sideways_tile_coord
 			
 	return null
