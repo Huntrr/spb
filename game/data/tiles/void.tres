@@ -16,3 +16,6 @@ id = -1
 pretty_name = "Void"
 blueprint_placement = SubResource( 1 )
 rotatable = false
+type = "BACKGROUND"
+prohibited_rots = [  ]
+mount_type = "ANY"

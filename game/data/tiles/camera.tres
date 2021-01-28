@@ -5,17 +5,17 @@
 
 [sub_resource type="Resource" id=1]
 script = ExtResource( 2 )
-tile_name = "floor"
-is_background = true
-default_rotation = 2
+tile_name = "camera"
+is_background = false
+default_rotation = 3
 rotate_like_door = false
 
 [resource]
 script = ExtResource( 1 )
-id = 0
-pretty_name = "Floor"
+id = 4
+pretty_name = "Camera"
 blueprint_placement = SubResource( 1 )
-rotatable = false
-type = "BACKGROUND"
-prohibited_rots = [  ]
+rotatable = true
+type = "INSIDE"
+prohibited_rots = [ 0, 2 ]
 mount_type = "ANY"

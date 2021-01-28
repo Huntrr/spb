@@ -1,17 +1,20 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://assets/ui/blueprint/tab_inactive.tres" type="StyleBox" id=1]
 [ext_resource path="res://assets/ui/blueprint/panel.tres" type="StyleBox" id=2]
 [ext_resource path="res://assets/ui/blueprint/tab_active.tres" type="StyleBox" id=3]
 [ext_resource path="res://assets/fonts/default.tres" type="DynamicFont" id=4]
 [ext_resource path="res://data/tiles/floor.tres" type="Resource" id=5]
+[ext_resource path="res://data/tiles/camera.tres" type="Resource" id=6]
+[ext_resource path="res://data/tiles/side_thruster.tres" type="Resource" id=7]
 [ext_resource path="res://data/tiles/door.tres" type="Resource" id=10]
 [ext_resource path="res://data/tiles/main_thruster.tres" type="Resource" id=11]
 [ext_resource path="res://src/ship_builder/tile_selector.gd" type="Script" id=12]
 
 [node name="TileSelector" type="TabContainer"]
+anchor_left = 0.000921488
 anchor_top = 0.700307
-anchor_right = 1.0
+anchor_right = 1.00092
 anchor_bottom = 1.00031
 margin_left = 10.0
 margin_top = 9.81561
@@ -28,4 +31,4 @@ script = ExtResource( 12 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-tiles = [ [ "Core", [ ExtResource( 5 ), ExtResource( 10 ), ExtResource( 11 ) ] ], [ "Battle Stations", [  ] ], [ "Space Station", [  ] ] ]
+tiles = [ [ "Core", [ ExtResource( 5 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 7 ), ExtResource( 6 ) ] ], [ "Battle Stations", [  ] ], [ "Space Station", [  ] ] ]

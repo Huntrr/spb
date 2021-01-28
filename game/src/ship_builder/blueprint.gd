@@ -1,9 +1,14 @@
 extends Node2D
 # Controller for the Blueprint node.
 
+const TILE_SIZE: int = 16
+
 export(float) var zoom_amount = 1
 export(float) var min_zoom = 0.5
 export(float) var max_zoom = 10
+# When we center the ship, this is how much padding we will
+# give the sides, in pixels.
+export(float) var center_zoom_padding = 50
 
 export(Resource) var door_tile
 export(Vector2) var sideways_tile_coord
@@ -12,6 +17,7 @@ onready var grid = $Grid
 onready var background = $Layers/Background
 onready var objects = $Layers/Objects
 onready var construct = $Layers/Construct
+onready var errors = $Layers/Errors
 
 var dragging := false setget _set_dragging
 var placing := false setget _set_placing
@@ -59,28 +65,47 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_mouse_move()
 
 
+func show_errors(error_locations: Array) -> void:
+	# Highlights each error location in red.
+	errors.clear()
+	var error_id: int = errors.tile_set.find_tile_by_name("error")
+	for pos in error_locations:
+		errors.set_cellv(pos, error_id)
+
+
 func center() -> void:
 	# Centers the current blueprint on screen.
-	var used_rect_bg: Rect2 = background.get_used_rect()
+	var used_rect: Rect2 = background.get_used_rect()
 	var used_rect_obj: Rect2 = objects.get_used_rect()
-	var used_rect: Rect2 = used_rect_bg.merge(used_rect_obj)
+	if used_rect_obj.size != Vector2.ZERO:
+		used_rect = used_rect.merge(used_rect_obj)
+	var padding: Vector2 = Vector2(2, 2) * center_zoom_padding
+	var ship_size: Vector2 = used_rect.size * 16 + padding
+	var viewport_size: Vector2 = get_viewport().size
+	
+	zoom = min(
+		 viewport_size.x / ship_size.x, viewport_size.y / ship_size.y)
+	scale = Vector2(zoom, zoom)
 	
 	var start: Vector2 = construct.map_to_world(used_rect.position)
 	var end: Vector2 = construct.map_to_world(used_rect.end)
-	var center: Vector2 = (start + end) / 2
-	
-	self.zoom = 3.0
-	set_global_position(-center)
+	var ship_center: Vector2 = (start + end) / 2
+	var viewport_center: Vector2 = viewport_size / 2
+	global_position = (
+		viewport_center - ship_center * scale +
+		Vector2.UP * center_zoom_padding / 2)
 	grid.update()
 	_update_construct()
+	errors.clear()
 
 
 func place_tile(tilemap: TileMap, coord: Vector2, tile: Tile, rot: int):
 	var id = tile.blueprint_placement.tile_id
 	
-	var flip_x := rot == Rotation.LEFT or rot == Rotation.UP
-	var flip_y := rot == Rotation.UP or rot == Rotation.RIGHT
-	var transpose := rot == Rotation.LEFT or rot == Rotation.RIGHT
+	
+	var flip_x: bool = rot == Rotation.LEFT or rot == Rotation.UP
+	var flip_y: bool = rot == Rotation.UP or rot == Rotation.RIGHT
+	var transpose: bool = rot == Rotation.LEFT or rot == Rotation.RIGHT
 	
 	if id == -1 and tilemap != construct:
 		for tm in [background, objects]:
@@ -103,14 +128,18 @@ func _update_construct() -> void:
 		if placing and current_tile.rotatable:
 			if mouse_coord.x == placing_coord.x:
 				if mouse_coord.y > placing_coord.y:
-					placing_rotation = Rotation.DOWN
+					if not current_tile.prohibited_rots.has(Rotation.DOWN):
+						placing_rotation = Rotation.DOWN
 				elif mouse_coord.y < placing_coord.y:
-					placing_rotation = Rotation.UP
+					if not current_tile.prohibited_rots.has(Rotation.UP):
+						placing_rotation = Rotation.UP
 			elif mouse_coord.y == placing_coord.y:
 				if mouse_coord.x > placing_coord.x:
-					placing_rotation = Rotation.RIGHT
+					if not current_tile.prohibited_rots.has(Rotation.RIGHT):
+						placing_rotation = Rotation.RIGHT
 				elif mouse_coord.x < placing_coord.x:
-					placing_rotation = Rotation.LEFT
+					if not current_tile.prohibited_rots.has(Rotation.LEFT):
+						placing_rotation = Rotation.LEFT
 		
 		if placing and not current_tile.blueprint_placement.is_background:
 			tile_rotation = placing_rotation

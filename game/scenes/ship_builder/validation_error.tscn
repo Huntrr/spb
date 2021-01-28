@@ -1,0 +1,57 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/fonts/body.tres" type="DynamicFont" id=1]
+[ext_resource path="res://assets/fonts/default-small.tres" type="DynamicFont" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends HBoxContainer
+
+export(Vector2) var position = Vector2(0, 0)
+export(Array, String) var errors = [\"Error!\"]
+
+func init(position_: Vector2, errors_: Array):
+	position = position_
+	errors = errors_
+	return self
+
+func _ready():
+	$Coord.set_text(\"x:%d\\ny:%d\" % [int(position.x), int(position.y)])
+	var error_str: String = \"\"
+	for i in errors.size():
+		error_str += \"%d. %s\" % [i + 1, errors[i]]
+		if i < errors.size() - 1:
+			error_str += \"\\n\"
+	$Errors.set_text(error_str)
+"
+
+[node name="ValidationError" type="HBoxContainer"]
+margin_right = 251.0
+margin_bottom = 203.0
+rect_min_size = Vector2( 0, 75 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 0
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Coord" type="Label" parent="."]
+margin_right = 50.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 50, 0 )
+size_flags_horizontal = 3
+size_flags_vertical = 0
+custom_fonts/font = ExtResource( 2 )
+align = 1
+
+[node name="Errors" type="RichTextLabel" parent="."]
+margin_left = 50.0
+margin_right = 251.0
+margin_bottom = 203.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+custom_fonts/normal_font = ExtResource( 1 )
+tab_size = 0
+scroll_active = false

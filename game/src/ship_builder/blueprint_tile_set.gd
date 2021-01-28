@@ -14,7 +14,7 @@ var sideways_tile_coord: Vector2
 var background: TileMap
 
 
-func _forward_subtile_selection(autotile_id, bitmask, tilemap, coord):
+func _forward_subtile_selection(autotile_id, _bitmask, _tilemap, coord):
 	if not active:
 		return null
 	

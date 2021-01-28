@@ -8,7 +8,7 @@ var scale: Vector2
 
 
 func _ready():
-	get_tree().get_root().connect("size_changed", self, "update")
+	assert(get_tree().get_root().connect("size_changed", self, "update") == OK)
 	update()
 
 

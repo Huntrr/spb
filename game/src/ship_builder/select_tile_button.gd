@@ -37,12 +37,17 @@ func _ready() -> void:
 	
 	focus_mode = Control.FOCUS_ALL
 	
-	connect("mouse_entered", self, "_on_mouse_enter")
-	connect("mouse_exited", self, "_on_mouse_exit")
-	connect("focus_entered", self, "_on_focus_enter")
-	connect("focus_exited", self, "_on_focus_exit")
+	assert(connect("mouse_entered", self, "_on_mouse_enter") == OK)
+	assert(connect("mouse_exited", self, "_on_mouse_exit") == OK)
+	assert(connect("focus_entered", self, "_on_focus_enter") == OK)
+	assert(connect("focus_exited", self, "_on_focus_exit") == OK)
 	
-	get_tree().get_root().connect("size_changed", self, "_on_resize")
+	assert(
+		get_tree().get_root().connect("size_changed", self, "_on_resize") == OK)
+	
+	# Can't rotate texture until after scene loads?
+	yield(get_tree().create_timer(0.1), "timeout")
+	_update()
 
 
 func _gui_input(event):
@@ -68,25 +73,32 @@ func _on_resize() -> void:
 	update()
 
 
-func _on_click():
+func _on_click() -> void:
 	if active and tile.rotatable:
 		self.rotation = Rotation.next(rotation)
+		var try_count := 0
+		while tile.prohibited_rots.has(rotation):
+			try_count += 1
+			if try_count > 4:
+				push_error("No allowed rotations")
+				return
+			self.rotation = Rotation.next(rotation)
 	emit_signal("tile_selected", tile, rotation)
 
 
-func _on_mouse_enter():
+func _on_mouse_enter() -> void:
 	self.hovered = true
 
 
-func _on_mouse_exit():
+func _on_mouse_exit() -> void:
 	self.hovered = false
 
 
-func _on_focus_enter():
+func _on_focus_enter() -> void:
 	self.focused = true
 
 
-func _on_focus_exit():
+func _on_focus_exit() -> void:
 	self.focused = false
 
 
