@@ -5,6 +5,7 @@ onready var blueprint = $Blueprint
 
 onready var save_dialog = $UI/SaveDialog
 onready var load_dialog = $UI/LoadDialog
+onready var validation_errors = $UI/ValidationErrors
 
 onready var run_button = (
 	$UI/CenterContainer/MarginContainer/HBoxContainer/PlayButton)
@@ -16,6 +17,12 @@ func _ready() -> void:
 	load_dialog.connect("file_selected", self, "_on_load_blueprint")
 
 	run_button.connect("pressed", self, "_on_run")
+	
+	validation_errors.connect(
+		"is_highlighted", self, "_on_error_is_highlighted")
+	blueprint.connect("is_error_highlighted", self, "_on_error_is_highlighted")
+
+	validation_errors.connect("is_selected", self, "_on_error_is_selected")
 
 
 func _on_tile_selected(tile: Tile, rotation: int) -> void:
@@ -27,6 +34,7 @@ func _on_save_blueprint(file_path: String) -> void:
 	var json: String = (
 		SpaceshipBlueprint.new().from_blueprint(blueprint).to_string())
 	var file = File.new()
+	validation_errors.hide()
 	file.open(file_path, File.WRITE)
 	file.store_string(json)
 	file.close()
@@ -37,6 +45,7 @@ func _on_load_blueprint(file_path: String) -> void:
 	file.open(file_path, File.READ)
 	var json = file.get_as_text()
 	file.close()
+	validation_errors.hide()
 	SpaceshipBlueprint.new().from_string(json).to_blueprint(blueprint)
 	blueprint.center()
 
@@ -50,6 +59,16 @@ func _on_run() -> void:
 	var errors = bp.validate()
 	if not errors.empty():
 		blueprint.show_errors(errors.keys())
-		$UI/ValidationErrors.show_errors(errors)
+		validation_errors.show_errors(errors)
 	else:
+		validation_errors.hide()
 		print("RUN")
+
+
+func _on_error_is_highlighted(position: Vector2) -> void:
+	validation_errors.highlight(position)
+	blueprint.highlight_error(position)
+
+
+func _on_error_is_selected(position: Vector2) -> void:
+	blueprint.focus_tile(position)

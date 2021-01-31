@@ -1,6 +1,9 @@
 extends Node2D
 # Controller for the Blueprint node.
 
+# Emitted when an error tile is highlighted.
+signal is_error_highlighted(position)
+
 const TILE_SIZE: int = 16
 
 export(float) var zoom_amount = 1
@@ -29,6 +32,8 @@ var current_tile: Tile = null
 var current_tile_rotation: int
 
 var drag_did_move := false
+
+var error_locations := [] setget show_errors
 
 
 func _get_configuration_warning() -> String:
@@ -65,7 +70,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_mouse_move()
 
 
-func show_errors(error_locations: Array) -> void:
+func highlight_error(position: Vector2) -> void:
+	# Highlights the error tile at |position|.
+	var error_id: int = errors.tile_set.find_tile_by_name("error")
+	var error_hover_id: int = errors.tile_set.find_tile_by_name("error_hover")
+	for pos in error_locations:
+		if pos == position:
+			errors.set_cellv(pos, error_hover_id)
+		else:
+			errors.set_cellv(pos, error_id)
+
+
+func focus_tile(coord: Vector2) -> void:
+	# Focuses on a specific tile |coord|
+	zoom = 3
+	scale = Vector2(zoom, zoom)
+	
+	var position: Vector2 = construct.map_to_world(coord)
+	var viewport_center: Vector2 = get_viewport().size / 2
+	global_position = (
+		viewport_center - position * scale +
+		Vector2.UP * center_zoom_padding / 2)
+	grid.update()
+	_update_construct()
+
+
+func show_errors(error_locations_: Array) -> void:
+	error_locations = error_locations_
+	
 	# Highlights each error location in red.
 	errors.clear()
 	var error_id: int = errors.tile_set.find_tile_by_name("error")
@@ -156,6 +188,8 @@ func _on_mouse_move() -> void:
 	if placing and current_tile != null:
 		if current_tile.blueprint_placement.is_background:
 			_place_tile(background, tile_coord, placing_rotation)
+	if errors.get_cellv(tile_coord) == errors.tile_set.find_tile_by_name("error"):
+		emit_signal("is_error_highlighted", tile_coord)
 
 
 func _set_placing(new_placing: bool) -> void:

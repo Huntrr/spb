@@ -190,6 +190,6 @@ __meta__ = {
 }
 
 [node name="ValidationErrors" parent="." instance=ExtResource( 2 )]
-resizable = true
+mouse_filter = 1
 [connection signal="pressed" from="CenterContainer/MarginContainer/HBoxContainer/SaveButton" to="SaveDialog" method="_on_save_pressed"]
 [connection signal="pressed" from="CenterContainer/MarginContainer/HBoxContainer/LoadButton" to="LoadDialog" method="_on_load_pressed"]
