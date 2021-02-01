@@ -44,6 +44,14 @@ func from_blueprint(blueprint: Node) -> SpaceshipBlueprint:
 							rot = Rotation.UP
 						else:
 							rot = Rotation.DOWN
+					if tile.blueprint_placement.rotate_like_door:
+						var auto_coord: Vector2 = (
+							tm.get_cell_autotile_coord(coord.x, coord.y))
+						if tile.blueprint_placement.door_vertical_tiles.has(
+								auto_coord):
+							rot = Rotation.DOWN
+						else:
+							rot = Rotation.LEFT
 					cells_.append(_mk_cell(x, y, id, rot))
 	cells = cells_
 	return self
@@ -124,7 +132,10 @@ func to_blueprint(blueprint: Node) -> void:
 		else:
 			tm = blueprint.objects
 		var coord := Vector2(cell.x, cell.y)
-		blueprint.place_tile(tm, coord, tile, cell.rot)
+		var rot: int = cell.rot
+		if tile.blueprint_placement.rotate_like_door:
+			rot = tile.blueprint_placement.default_rotation
+		blueprint.place_tile(tm, coord, tile, rot)
 
 
 func to_ship(ship) -> void:
@@ -176,8 +187,16 @@ func validate() -> Dictionary:
 						cell_errors.append(
 							"%s needs at least %d tiles of clearance" % [
 								tile.pretty_name, tile.clearance_tiles])
+						break
 			
-			if (not tile.rotatable and
+			if tile.blueprint_placement.rotate_like_door:
+				for i in [-1, 1]:
+					var check_pos: Vector2 = pos + i * Rotation.get_dir(layer.rot)
+					if (has_background(check_pos) and
+						not _has_id(check_pos, layer.id, layer.rot)):
+						cell_errors.append("Doors must connect 2 walls.")
+						break
+			elif (not tile.rotatable and
 					layer.rot != tile.blueprint_placement.default_rotation):
 				cell_errors.append("%s can't be rotated." % tile.pretty_name)
 			elif tile.prohibited_rots.has(layer.rot):
@@ -230,6 +249,15 @@ func get_cells(x: int, y: int) -> Array:
 			result.append(cell)
 	cells_cache[Vector2(x, y)] = result
 	return result
+
+
+func _has_id(pos: Vector2, id: int, rot: int) -> bool:
+	# Returns true if cell at |pos| contains a tile with id |id|.
+	var cells_: Array = get_cellsv(pos)
+	for cell in cells_:
+		if cell.id == id and cell.rot == rot:
+			return true
+	return false
 
 static func _mk_cell(x: int, y: int, id: int, rot: int) -> Dictionary:
 	return {

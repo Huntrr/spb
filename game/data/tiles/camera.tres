@@ -10,6 +10,7 @@ script = ExtResource( 2 )
 tile_name = "camera"
 default_rotation = 3
 rotate_like_door = false
+door_vertical_tiles = [  ]
 
 [sub_resource type="Resource" id=2]
 script = ExtResource( 3 )

@@ -10,6 +10,7 @@ script = ExtResource( 2 )
 tile_name = "main_thruster"
 default_rotation = 2
 rotate_like_door = false
+door_vertical_tiles = [  ]
 
 [sub_resource type="Resource" id=2]
 script = ExtResource( 3 )

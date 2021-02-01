@@ -9,6 +9,8 @@ export(String) var tile_name setget _set_tile_name
 
 export(int, "Up", "Right", "Down", "Left") var default_rotation = 2
 export(bool) var rotate_like_door 
+# List of autotile coordinates associated with the vertical door.
+export(Array, Vector2) var door_vertical_tiles
 
 var tile_id: int
 var tile_texture: Texture
