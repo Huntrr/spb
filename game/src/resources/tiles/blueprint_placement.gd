@@ -7,7 +7,6 @@ const tileset: TileSet = (
 
 export(String) var tile_name setget _set_tile_name
 
-export(bool) var is_background
 export(int, "Up", "Right", "Down", "Left") var default_rotation = 2
 export(bool) var rotate_like_door 
 

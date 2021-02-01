@@ -12,3 +12,9 @@ export(bool) var rotatable = true
 export(String, "BACKGROUND", "INSIDE", "OUTSIDE", "FLEX") var type = "BACKGROUND"
 export(Array, int, "UP", "RIGHT", "DOWN", "LEFT") var prohibited_rots = []
 export(String, "ANY", "BEHIND") var mount_type = "ANY"
+
+# Number of tiles of empty clearance this cell needs in front of it.
+export(int) var clearance_tiles = 0
+
+func is_background() -> bool:
+	return type == "BACKGROUND"

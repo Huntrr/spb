@@ -6,9 +6,12 @@ onready var blueprint = $Blueprint
 onready var save_dialog = $UI/SaveDialog
 onready var load_dialog = $UI/LoadDialog
 onready var validation_errors = $UI/ValidationErrors
+onready var preview = $UI/Preview
 
 onready var run_button = (
 	$UI/CenterContainer/MarginContainer/HBoxContainer/PlayButton)
+
+const TILE_SIZE := 32
 
 func _ready() -> void:
 	tile_selector.connect("tile_selected", self, "_on_tile_selected")
@@ -62,7 +65,13 @@ func _on_run() -> void:
 		validation_errors.show_errors(errors)
 	else:
 		validation_errors.hide()
-		print("RUN")
+		preview.show()
+		bp.to_ship(preview.ship)
+		
+		var bounds: Rect2 = bp.get_bounds()
+		var bounds_pixels := Rect2(
+			bounds.position * TILE_SIZE, bounds.size * TILE_SIZE)
+		preview.set_bounds(bounds_pixels)
 
 
 func _on_error_is_highlighted(position: Vector2) -> void:

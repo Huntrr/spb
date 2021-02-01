@@ -6,7 +6,6 @@
 [sub_resource type="Resource" id=1]
 script = ExtResource( 2 )
 tile_name = ""
-is_background = true
 default_rotation = 2
 rotate_like_door = false
 
@@ -19,3 +18,4 @@ rotatable = false
 type = "BACKGROUND"
 prohibited_rots = [  ]
 mount_type = "ANY"
+clearance_tiles = 0

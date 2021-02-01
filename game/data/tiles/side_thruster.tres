@@ -6,7 +6,6 @@
 [sub_resource type="Resource" id=1]
 script = ExtResource( 2 )
 tile_name = "side_thruster"
-is_background = false
 default_rotation = 2
 rotate_like_door = false
 
@@ -19,3 +18,4 @@ rotatable = true
 type = "OUTSIDE"
 prohibited_rots = [  ]
 mount_type = "BEHIND"
+clearance_tiles = 1

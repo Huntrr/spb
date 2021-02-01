@@ -173,9 +173,9 @@ func _update_construct() -> void:
 					if not current_tile.prohibited_rots.has(Rotation.LEFT):
 						placing_rotation = Rotation.LEFT
 		
-		if placing and not current_tile.blueprint_placement.is_background:
+		if placing and not current_tile.is_background():
 			tile_rotation = placing_rotation
-			if not current_tile.blueprint_placement.is_background:
+			if not current_tile.is_background():
 				tile_coord = placing_coord
 		else:
 			tile_coord = mouse_coord
@@ -186,7 +186,7 @@ func _update_construct() -> void:
 func _on_mouse_move() -> void:
 	var tile_coord: Vector2 = construct.world_to_map(get_local_mouse_position())
 	if placing and current_tile != null:
-		if current_tile.blueprint_placement.is_background:
+		if current_tile.is_background():
 			_place_tile(background, tile_coord, placing_rotation)
 	if errors.get_cellv(tile_coord) == errors.tile_set.find_tile_by_name("error"):
 		emit_signal("is_error_highlighted", tile_coord)
@@ -194,7 +194,7 @@ func _on_mouse_move() -> void:
 
 func _set_placing(new_placing: bool) -> void:
 	if current_tile != null:
-		if not current_tile.blueprint_placement.is_background:
+		if not current_tile.is_background():
 			if not placing and new_placing:
 				# User is pressing their mouse button.
 				placing_coord = construct.world_to_map(get_local_mouse_position())

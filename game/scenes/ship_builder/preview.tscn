@@ -1,0 +1,135 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://scenes/ship/ship.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/ui/panel.tres" type="StyleBox" id=2]
+[ext_resource path="res://assets/fonts/default.tres" type="DynamicFont" id=3]
+[ext_resource path="res://assets/ui/x.png" type="Texture" id=4]
+[ext_resource path="res://assets/ui/x_hover.png" type="Texture" id=5]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends WindowDialog
+
+const TILE_SIZE := 32
+
+onready var ship = $ViewportContainer/Viewport/Ship
+onready var _camera: Camera2D = $ViewportContainer/Viewport/Camera2D
+
+func set_bounds(bounds: Rect2) -> void:
+	var vp_size: Vector2 = get_viewport().size
+	
+	_camera.bounds = bounds
+	
+	var ratio: Vector2 = (
+		(bounds.size * 2) / vp_size)
+	_camera.zoom_amount = max(ratio.x, ratio.y)
+
+	_camera.offset = (
+		bounds.size / 2 + bounds.position + Vector2.ONE * TILE_SIZE / 2)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(\"ui_cancel\"):
+		visible = false
+"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Camera2D
+# Preview camera controls
+
+export(float) var _PAN_SPEED: float = 3.0
+export(float) var _ZOOM_SPEED: float = 1.0
+
+export(float) var _MIN_ZOOM: float = 0.2
+export(float) var _MAX_ZOOM: float = 5.0
+
+var _dragging := false
+
+var zoom_amount := 1.0 setget _set_zoom
+var bounds: Rect2
+
+func _input(event: InputEvent) -> void:
+	if _dragging and event is InputEventMouseMotion:
+		_translate(event.relative * zoom_amount)
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_RIGHT:
+			_dragging = event.pressed
+	if event is InputEventPanGesture:
+		self.zoom_amount += event.delta.y * _ZOOM_SPEED
+
+
+func _process(delta: float) -> void:
+	if Input.is_action_pressed(\"game_down\"):
+		_translate(_PAN_SPEED * Vector2.DOWN)
+	
+	if Input.is_action_pressed(\"game_left\"):
+		_translate(_PAN_SPEED * Vector2.LEFT)
+	
+	if Input.is_action_pressed(\"game_right\"):
+		_translate(_PAN_SPEED * Vector2.RIGHT)
+	
+	if Input.is_action_pressed(\"game_up\"):
+		_translate(_PAN_SPEED * Vector2.UP)
+
+
+func _set_zoom(zoom_amount_: float) -> void:
+	zoom_amount = clamp(
+		zoom_amount_, _MIN_ZOOM, _MAX_ZOOM)
+	var pre_mouse_pos := get_local_mouse_position()
+	zoom = Vector2.ONE * zoom_amount
+	var post_mouse_pos := get_local_mouse_position()
+	_translate(post_mouse_pos - pre_mouse_pos)
+
+func _translate(delta: Vector2) -> void:
+	var vp_size: Vector2 = get_viewport().size * zoom_amount - 20 * Vector2.ONE
+	offset -= delta
+	if bounds != null:
+		offset.x = clamp(
+			offset.x,
+			bounds.position.x - vp_size.x / 2,
+			bounds.end.x + vp_size.x / 2)
+		offset.y = clamp(
+			offset.y,
+			bounds.position.y - vp_size.y / 2,
+			bounds.end.y + vp_size.y / 2)
+"
+
+[node name="Preview" type="WindowDialog"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 30.0
+margin_top = 52.0
+margin_right = -30.0
+margin_bottom = -30.0
+mouse_filter = 1
+custom_icons/close_highlight = ExtResource( 5 )
+custom_icons/close = ExtResource( 4 )
+custom_styles/panel = ExtResource( 2 )
+custom_fonts/title_font = ExtResource( 3 )
+custom_colors/title_color = Color( 1, 1, 1, 1 )
+window_title = "Preview"
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ViewportContainer" type="ViewportContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+stretch = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Viewport" type="Viewport" parent="ViewportContainer"]
+size = Vector2( 964, 518 )
+transparent_bg = true
+handle_input_locally = false
+usage = 0
+render_target_update_mode = 0
+
+[node name="Ship" parent="ViewportContainer/Viewport" instance=ExtResource( 1 )]
+
+[node name="Camera2D" type="Camera2D" parent="ViewportContainer/Viewport"]
+current = true
+script = SubResource( 2 )

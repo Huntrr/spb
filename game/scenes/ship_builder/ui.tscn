@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://scenes/ship_builder/tile_selector.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scenes/ship_builder/validation_errors.tscn" type="PackedScene" id=2]
@@ -17,6 +17,7 @@
 [ext_resource path="res://data/tiles/main_thruster.tres" type="Resource" id=15]
 [ext_resource path="res://data/tiles/camera.tres" type="Resource" id=16]
 [ext_resource path="res://data/tiles/void.tres" type="Resource" id=17]
+[ext_resource path="res://scenes/ship_builder/preview.tscn" type="PackedScene" id=18]
 
 [sub_resource type="InputEventAction" id=1]
 action = "ui_save"
@@ -48,10 +49,10 @@ func _ready() -> void:
 	dir.open(\"user://\")
 	dir.make_dir(\"blueprints\")
 	
-	connect(\"dir_selected\", self, \"_on_dir_selected\")
+	assert(connect(\"dir_selected\", self, \"_on_dir_selected\") == OK)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not current_dir.begins_with(DIR_PREFIX):
 		current_dir = DIR_PREFIX
 
@@ -87,29 +88,31 @@ func _on_load_pressed() -> void:
 "
 
 [node name="UI" type="Control"]
-anchor_left = -0.000745416
-anchor_top = 0.00127223
-anchor_right = 0.999255
-anchor_bottom = 1.00127
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 0.763306
 margin_top = -0.763336
 margin_right = 0.762817
 margin_bottom = -0.762024
 mouse_filter = 2
 __meta__ = {
+"_edit_lock_": true,
 "_edit_use_anchors_": false
 }
 
 [node name="TileSelector" parent="." instance=ExtResource( 1 )]
-margin_left = 16.0
+anchor_left = 0.0
+anchor_right = 1.0
+margin_left = 6.0
 margin_top = 10.5157
-margin_right = -4.0
+margin_right = -6.0
 margin_bottom = -9.29987
 tiles = [ [ "Core", [ ExtResource( 17 ), ExtResource( 5 ), ExtResource( 4 ), ExtResource( 15 ), ExtResource( 3 ), ExtResource( 16 ) ] ], [ "Battle Stations", [  ] ], [ "Space Station", [  ] ] ]
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 anchor_right = 1.0
 margin_bottom = 30.0
+mouse_filter = 2
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -191,5 +194,7 @@ __meta__ = {
 
 [node name="ValidationErrors" parent="." instance=ExtResource( 2 )]
 mouse_filter = 1
+
+[node name="Preview" parent="." instance=ExtResource( 18 )]
 [connection signal="pressed" from="CenterContainer/MarginContainer/HBoxContainer/SaveButton" to="SaveDialog" method="_on_save_pressed"]
 [connection signal="pressed" from="CenterContainer/MarginContainer/HBoxContainer/LoadButton" to="LoadDialog" method="_on_load_pressed"]

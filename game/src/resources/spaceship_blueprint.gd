@@ -5,10 +5,16 @@ extends Resource
 const tile_registry: TileRegistry = (
 	preload("res://data/tiles/tile_registry.tres"))
 
-var cells: Array
+var cells: Array = []
+
+var cells_cache: Dictionary = {}
+var has_bg_cache: Dictionary = {}
 
 func from_blueprint(blueprint: Node) -> SpaceshipBlueprint:
 	# Loads a Spaceship from blueprint tilemaps.
+	cells_cache.clear()
+	has_bg_cache.clear()
+	
 	blueprint.background.fix_invalid_tiles()
 	blueprint.objects.fix_invalid_tiles()
 	
@@ -45,6 +51,9 @@ func from_blueprint(blueprint: Node) -> SpaceshipBlueprint:
 
 func from_string(json: String) -> SpaceshipBlueprint:
 	# Loads a Spaceship from a JSON string.
+	cells_cache.clear()
+	has_bg_cache.clear()
+	
 	var json_result := JSON.parse(json)
 	if json_result.error == OK:
 		cells = json_result.result
@@ -58,6 +67,50 @@ func _init(cells_: Array = []) -> void:
 	cells = cells_
 
 
+func is_empty(pos: Vector2, allow_background: bool = false) -> bool:
+	# Returns true if the given tile is empty (or if it's background and
+	# |allow_background|).
+	var cells_ = get_cellsv(pos)
+	if not cells_.empty() and not allow_background:
+		return false
+	
+	for cell in cells_:
+		var tile: Tile = tile_registry.by_id(cell.id)
+		if not tile.is_background():
+			return false
+	
+	return true
+
+func has_background(pos: Vector2) -> bool:
+	if has_bg_cache.has(pos):
+		return has_bg_cache[pos]
+		
+	var layers: Array = get_cellsv(pos)
+	for layer in layers:
+		var tile: Tile = tile_registry.by_id(layer.id)
+		if tile.is_background():
+			has_bg_cache[pos] = true
+			return true
+	has_bg_cache[pos] = false
+	return false
+
+
+func get_bounds() -> Rect2:
+	if cells.size() == 0:
+		return Rect2(0, 0, 0, 0)
+	
+	var begin := Vector2(cells[0].x, cells[0].y)
+	var end := Vector2(cells[0].x, cells[0].y)
+	
+	for cell in cells:
+		begin.x = min(begin.x, cell.x)
+		begin.y = min(begin.y, cell.y)
+		end.x = max(end.x, cell.x)
+		end.y = max(end.y, cell.y)
+	
+	return Rect2(begin, end - begin)
+
+
 func to_blueprint(blueprint: Node) -> void:
 	# Loads this Spaceship into a Blueprint.
 	blueprint.background.clear()
@@ -66,12 +119,16 @@ func to_blueprint(blueprint: Node) -> void:
 	for cell in cells:
 		var tile: Tile = tile_registry.by_id(cell.id)
 		var tm: TileMap
-		if tile.blueprint_placement.is_background:
+		if tile.is_background():
 			tm = blueprint.background
 		else:
 			tm = blueprint.objects
 		var coord := Vector2(cell.x, cell.y)
 		blueprint.place_tile(tm, coord, tile, cell.rot)
+
+
+func to_ship(ship) -> void:
+	ship.load_from_spb(self)
 
 
 func to_string() -> String:
@@ -95,6 +152,7 @@ func validate() -> Dictionary:
 		var need_outside := false
 		var need_inside := false
 		var need_mount := Vector2.ZERO
+		
 		for layer in visited[pos]:
 			var tile: Tile = tile_registry.by_id(layer.id)
 			if tile.type == "BACKGROUND":
@@ -110,6 +168,14 @@ func validate() -> Dictionary:
 				if tile.type == "OUTSIDE" or tile.type == "FLEX":
 					if tile.mount_type == "BEHIND":
 						need_mount = _behind(layer.rot)
+				
+				for i in range(tile.clearance_tiles):
+					var check_pos: Vector2 = (
+						pos + Rotation.get_dir(layer.rot) * (i + 1))
+					if not is_empty(check_pos, has_background(pos)):
+						cell_errors.append(
+							"%s needs at least %d tiles of clearance" % [
+								tile.pretty_name, tile.clearance_tiles])
 			
 			if (not tile.rotatable and
 					layer.rot != tile.blueprint_placement.default_rotation):
@@ -131,13 +197,13 @@ func validate() -> Dictionary:
 		if not need_inside and num_backgrounds == 0 and num_objects != 0:
 			# Outside objects must be mounted to a wall.
 			if need_mount != Vector2.ZERO:
-				if not _has_background(pos + need_mount):
+				if not has_background(pos + need_mount):
 					cell_errors.append(
 						"Object needs to be mounted on a wall.")
 			else:
 				var is_mounted := false
 				for v in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
-					if _has_background(pos + v):
+					if has_background(pos + v):
 						is_mounted = true
 				if not is_mounted:
 					cell_errors.append("Object needs to be next to a wall.")
@@ -155,10 +221,14 @@ func get_cellsv(pos: Vector2) -> Array:
 
 
 func get_cells(x: int, y: int) -> Array:
+	if cells_cache.has(Vector2(x, y)):
+		return cells_cache[Vector2(x, y)]
+		
 	var result := []
 	for cell in cells:
 		if cell.x == x and cell.y == y:
 			result.append(cell)
+	cells_cache[Vector2(x, y)] = result
 	return result
 
 static func _mk_cell(x: int, y: int, id: int, rot: int) -> Dictionary:
@@ -168,15 +238,6 @@ static func _mk_cell(x: int, y: int, id: int, rot: int) -> Dictionary:
 		"id": id,
 		"rot": rot,
 	}
-
-
-func _has_background(pos: Vector2) -> bool:
-	var layers: Array = get_cellsv(pos)
-	for layer in layers:
-		var tile: Tile = tile_registry.by_id(layer.id)
-		if tile.type == "BACKGROUND":
-			return true
-	return false
 
 
 func _behind(rot: int) -> Vector2:
