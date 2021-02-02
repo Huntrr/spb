@@ -1,0 +1,29 @@
+[gd_resource type="Resource" load_steps=7 format=2]
+
+[ext_resource path="res://src/resources/tiles/tile.gd" type="Script" id=1]
+[ext_resource path="res://src/resources/tiles/blueprint_placement.gd" type="Script" id=2]
+[ext_resource path="res://src/resources/tiles/ship_placement.gd" type="Script" id=3]
+[ext_resource path="res://scenes/ship/object_tiles/teleporter/teleporter.tscn" type="PackedScene" id=4]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 2 )
+tile_name = "teleporter"
+default_rotation = 2
+rotate_like_door = false
+door_vertical_tiles = [  ]
+
+[sub_resource type="Resource" id=2]
+script = ExtResource( 3 )
+object = ExtResource( 4 )
+
+[resource]
+script = ExtResource( 1 )
+id = 5
+pretty_name = "Teleporter"
+blueprint_placement = SubResource( 1 )
+ship_placement = SubResource( 2 )
+rotatable = false
+type = "INSIDE"
+prohibited_rots = [  ]
+mount_type = "ANY"
+clearance_tiles = 0

@@ -19,22 +19,20 @@ func _ready():
 
 func set_state(up: bool = true) -> void:
 	_tile_map.clear()
-	if up:
-		_tile_map.set_cell(0, -1, _down_tile_id)
-	
+
 	var tile_id: int = _up_tile_id if up else _down_tile_id
-	for i in range(object_tile.height):
-		_tile_map.set_cell(0, i, tile_id)
+	for i in range(object_tile.width):
+		_tile_map.set_cell(i, 0, tile_id)
 "
 
 [node name="Door" type="Node2D"]
 script = SubResource( 1 )
-_up_tile = "door_vert_1"
-_down_tile = "door_vert_0"
+_up_tile = "door_horiz_1"
+_down_tile = "door_horiz_0"
 
 [node name="TileMap" type="TileMap" parent="."]
 position = Vector2( -16, -16 )
 tile_set = ExtResource( 1 )
 cell_size = Vector2( 32, 32 )
 format = 1
-tile_data = PoolIntArray( 0, 6, 0 )
+tile_data = PoolIntArray( 0, 7, 0 )

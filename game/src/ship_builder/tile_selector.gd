@@ -3,7 +3,31 @@ extends TabContainer
 
 signal tile_selected(tile, rotation)
 
-export(Array) var tiles
+export(Array) var tiles = [
+	["Core", [
+		preload("res://data/tiles/void.tres"),
+		preload("res://data/tiles/floor.tres"),
+		preload("res://data/tiles/main_thruster.tres"),
+		preload("res://data/tiles/side_thruster.tres"),
+		preload("res://data/tiles/camera.tres"),
+		preload("res://data/tiles/generator.tres"),
+		preload("res://data/tiles/spawn.tres"),
+	]],
+	["Battle Stations", [
+		preload("res://data/tiles/helm.tres"),
+		preload("res://data/tiles/turret.tres"),
+		preload("res://data/tiles/teleporter.tres"),
+		preload("res://data/tiles/radar.tres"),
+		preload("res://data/tiles/shields.tres"),
+		preload("res://data/tiles/security.tres"),
+		preload("res://data/tiles/engineering.tres"),
+	]],
+	["Space Station", [
+		preload("res://data/tiles/dressing_room.tres"),
+		preload("res://data/tiles/ship_builder.tres"),
+		preload("res://data/tiles/simulator.tres"),
+	]],
+]
 
 const SelectTileButton := (
 	preload("res://scenes/ship_builder/select_tile_button.tscn"))

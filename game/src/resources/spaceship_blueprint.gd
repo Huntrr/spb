@@ -51,7 +51,7 @@ func from_blueprint(blueprint: Node) -> SpaceshipBlueprint:
 								auto_coord):
 							rot = Rotation.DOWN
 						else:
-							rot = Rotation.LEFT
+							rot = Rotation.RIGHT
 					cells_.append(_mk_cell(x, y, id, rot))
 	cells = cells_
 	return self
@@ -194,7 +194,7 @@ func validate() -> Dictionary:
 				for i in [-1, 1]:
 					var check_pos: Vector2 = pos + i * Rotation.get_dir(layer.rot)
 					if (has_background(check_pos) and
-						not _has_id(check_pos, layer.id, layer.rot)):
+						not has_id(check_pos, layer.id, layer.rot)):
 						cell_errors.append("Doors must connect 2 walls.")
 						break
 			elif (not tile.rotatable and
@@ -252,7 +252,7 @@ func get_cells(x: int, y: int) -> Array:
 	return result
 
 
-func _has_id(pos: Vector2, id: int, rot: int) -> bool:
+func has_id(pos: Vector2, id: int, rot: int) -> bool:
 	# Returns true if cell at |pos| contains a tile with id |id|.
 	var cells_: Array = get_cellsv(pos)
 	for cell in cells_:

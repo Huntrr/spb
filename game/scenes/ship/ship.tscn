@@ -15,7 +15,7 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="Interior" type="YSort" parent="."]
+[node name="Layer0" type="YSort" parent="."]
 
 [node name="Ceiling" type="TileMap" parent="."]
 tile_set = ExtResource( 1 )
@@ -25,4 +25,5 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="Exterior" type="YSort" parent="."]
+[node name="Layer1" type="YSort" parent="."]
+visible = false

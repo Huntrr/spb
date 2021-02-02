@@ -5,6 +5,10 @@ extends Node2D
 export(int) var _rot
 export(String, "IN", "UP", "OUT") var _placement_type
 
+# Width and height in tile units.
+export(int) var width = 1
+export(int) var height = 1
+
 # Relevant pixel offsets for specific placement configurations.
 const _UP_OFFSET = -8
 
@@ -15,9 +19,11 @@ onready var _offset = $Offset
 onready var _rotation_view_manager = $Offset/RotationViewManager
 
 
-func init(rot_: int, placement_type_: String):
+func init(rot_: int, placement_type_: String, width_ := 1, height_ := 1):
 	_rot = rot_
 	_placement_type = placement_type_
+	width = width_
+	height = height_
 	return self
 
 

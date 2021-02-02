@@ -1,10 +1,7 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://scenes/ship_builder/tile_selector.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scenes/ship_builder/validation_errors.tscn" type="PackedScene" id=2]
-[ext_resource path="res://data/tiles/side_thruster.tres" type="Resource" id=3]
-[ext_resource path="res://data/tiles/door.tres" type="Resource" id=4]
-[ext_resource path="res://data/tiles/floor.tres" type="Resource" id=5]
 [ext_resource path="res://assets/ui/blueprint/load_normal.png" type="Texture" id=6]
 [ext_resource path="res://assets/ui/blueprint/play_hover.png" type="Texture" id=7]
 [ext_resource path="res://assets/ui/blueprint/play_normal.png" type="Texture" id=8]
@@ -14,9 +11,6 @@
 [ext_resource path="res://assets/ui/blueprint/load_active.png" type="Texture" id=12]
 [ext_resource path="res://assets/ui/blueprint/save_hover.png" type="Texture" id=13]
 [ext_resource path="res://assets/ui/blueprint/play_active.png" type="Texture" id=14]
-[ext_resource path="res://data/tiles/main_thruster.tres" type="Resource" id=15]
-[ext_resource path="res://data/tiles/camera.tres" type="Resource" id=16]
-[ext_resource path="res://data/tiles/void.tres" type="Resource" id=17]
 [ext_resource path="res://scenes/ship_builder/preview.tscn" type="PackedScene" id=18]
 
 [sub_resource type="InputEventAction" id=1]
@@ -107,7 +101,6 @@ margin_left = 6.0
 margin_top = 10.5157
 margin_right = -6.0
 margin_bottom = -9.29987
-tiles = [ [ "Core", [ ExtResource( 17 ), ExtResource( 5 ), ExtResource( 4 ), ExtResource( 15 ), ExtResource( 3 ), ExtResource( 16 ) ] ], [ "Battle Stations", [  ] ], [ "Space Station", [  ] ] ]
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 anchor_right = 1.0

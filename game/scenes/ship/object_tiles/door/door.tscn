@@ -2,10 +2,10 @@
 
 [ext_resource path="res://scenes/ship/object_tiles/door/down.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scenes/ship/object_tiles/object_tile.tscn" type="PackedScene" id=2]
-[ext_resource path="res://scenes/ship/object_tiles/door/left.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scenes/ship/object_tiles/door/right.tscn" type="PackedScene" id=3]
 
 [node name="ObjectTile" instance=ExtResource( 2 )]
 
 [node name="RotationViewManager" parent="Offset" index="0"]
 _DownView = ExtResource( 1 )
-_LeftView = ExtResource( 3 )
+_RightView = ExtResource( 3 )

@@ -9,6 +9,8 @@ var rot setget _set_rot
 
 var _node: Node2D
 
+onready var object_tile: ObjectTile = get_parent().get_parent()
+
 func _get_configuration_warning() -> String:
 	if _coalesce([_DownView, _LeftView, _UpView, _RightView]) == null:
 		return "At least one directional view must be specified."

@@ -13,15 +13,15 @@ const SURROUND_DIRS := [
 const tile_registry: TileRegistry = preload("res://data/tiles/tile_registry.tres")
 
 onready var _base: TileMap = $Base
-onready var _interior: YSort = $Interior
+onready var _l0: YSort = $Layer0
 onready var _ceiling: TileMap = $Ceiling
-onready var _exterior: YSort = $Exterior
+onready var _l1: YSort = $Layer1
 
 onready var _floor_id: int = _base.tile_set.find_tile_by_name(FLOOR_TILE_NAME)
 onready var _wall_id: int = _base.tile_set.find_tile_by_name(WALL_TILE_NAME)
 
 func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
-	for container in [_base, _interior, _ceiling, _exterior]:
+	for container in [_base, _l0, _ceiling, _l1]:
 		for child in container.get_children():
 			child.queue_free()
 		if container is TileMap:
@@ -41,18 +41,44 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 		
 		if tile.ship_placement:
 			var position: Vector2 = coord * CELL_SIZE + Vector2.ONE * CELL_SIZE / 2
-			if tile.ship_placement.object != null:
-				var type := "IN" if blueprint.has_background(coord) else "OUT"
+			var width := 1
+			var height := 1
+			if tile.blueprint_placement.rotate_like_door:
+				# Doors should be drawn as a single object.
+				var next = Rotation.get_dir(rot).abs()
+				if blueprint.has_id(coord - next, cell.id, rot):
+					# This is not the first door tile for this door,
+					# so skip it.
+					continue
+				var size := 0
+				var local_coord: Vector2 = coord
+				while blueprint.has_id(local_coord, cell.id, rot):
+					size += 1
+					local_coord += next
+				if next.x > 0:
+					width = size
+				else:
+					height = size 
+				
+			var has_l0 := false
+			if (tile.ship_placement.object != null and
+					blueprint.has_background(coord)):
+				var type := "IN"
 				var instance: ObjectTile = (
-					tile.ship_placement.object.instance().init(rot, type))
+					tile.ship_placement.object.instance().init(
+						rot, type, width, height))
 				instance.position = position
-				_interior.add_child(instance)
+				_l0.add_child(instance)
+				has_l0 = true
 			
 			if tile.ship_placement.exterior_object != null:
 				var type := "UP" if blueprint.has_background(coord) else "OUT"
 				var instance: ObjectTile = (
-					tile.ship_placement.exterior_object.instance().init(rot, type))
+					tile.ship_placement.exterior_object.instance().init(
+					rot, type, width, height))
 				instance.position = position
-				_exterior.add_child(instance)
+				
+				var layer: YSort = _l1 if has_l0 else _l0
+				layer.add_child(instance)
 	for tm in [_base, _ceiling]:
 		tm.update_bitmask_region()
