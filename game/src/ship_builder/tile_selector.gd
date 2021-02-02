@@ -7,6 +7,7 @@ export(Array) var tiles = [
 	["Core", [
 		preload("res://data/tiles/void.tres"),
 		preload("res://data/tiles/floor.tres"),
+		preload("res://data/tiles/door.tres"),
 		preload("res://data/tiles/main_thruster.tres"),
 		preload("res://data/tiles/side_thruster.tres"),
 		preload("res://data/tiles/camera.tres"),
