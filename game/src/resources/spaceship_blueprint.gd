@@ -185,8 +185,9 @@ func validate() -> Dictionary:
 						pos + Rotation.get_dir(layer.rot) * (i + 1))
 					if not is_empty(check_pos, has_background(pos)):
 						cell_errors.append(
-							"%s needs at least %d tiles of clearance" % [
-								tile.pretty_name, tile.clearance_tiles])
+							"%s needs at least %d tile%s of clearance" % [
+								tile.pretty_name, tile.clearance_tiles,
+								"s" if tile.clearance_tiles != 1 else ""])
 						break
 			
 			if tile.blueprint_placement.rotate_like_door:
