@@ -1,7 +1,25 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://assets/tiles/ship/tileset.tres" type="TileSet" id=1]
 [ext_resource path="res://src/ship/ship.gd" type="Script" id=2]
+[ext_resource path="res://assets/tiles/ship/wrap.png" type="Texture" id=3]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform sampler2D alpha_mask : hint_albedo;
+uniform float cell_size;
+
+void fragment(){
+  //COLOR = vec4(texture(TEXTURE, UV).rgb, texture(alpha_mask, UV / cell_size).a);
+  //COLOR = vec4(0, 1.0 - texture(alpha_mask, UV / cell_size).b, 0, texture(alpha_mask, UV / cell_size).a);
+  float alpha = texture(alpha_mask, UV / cell_size).a;
+  COLOR = vec4(1, 0, 0, alpha);
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/cell_size = 16.0
 
 [node name="Ship" type="Node2D"]
 script = ExtResource( 2 )
@@ -16,13 +34,19 @@ __meta__ = {
 }
 
 [node name="Layer0" type="YSort" parent="."]
-
-[node name="Ceiling" type="TileMap" parent="."]
-tile_set = ExtResource( 1 )
-cell_size = Vector2( 16, 16 )
-format = 1
 __meta__ = {
 "_edit_lock_": true
 }
 
+[node name="Wrap" type="Sprite" parent="."]
+material = SubResource( 2 )
+texture = ExtResource( 3 )
+centered = false
+region_enabled = true
+region_rect = Rect2( 0, 0, 64, 64 )
+
 [node name="Layer1" type="YSort" parent="."]
+visible = false
+__meta__ = {
+"_edit_lock_": true
+}

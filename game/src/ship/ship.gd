@@ -14,26 +14,42 @@ const tile_registry: TileRegistry = preload("res://data/tiles/tile_registry.tres
 
 onready var _base: TileMap = $Base
 onready var _l0: YSort = $Layer0
-onready var _ceiling: TileMap = $Ceiling
+onready var _wrap: Sprite = $Wrap
 onready var _l1: YSort = $Layer1
 
 onready var _floor_id: int = _base.tile_set.find_tile_by_name(FLOOR_TILE_NAME)
 onready var _wall_id: int = _base.tile_set.find_tile_by_name(WALL_TILE_NAME)
 
+enum MaskType {
+	FULL,
+	HALF,
+}
+
+var mask: Texture = ImageTexture.new()
+
 func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
-	for container in [_base, _l0, _ceiling, _l1]:
+	for container in [_base, _l0, _wrap, _l1]:
 		for child in container.get_children():
 			child.queue_free()
 		if container is TileMap:
 			container.clear()
 	
+	var max_x := 0
+	var max_y := 0
+	var mask_cells := {}
+	
 	for cell in blueprint.cells:
+		max_x = int(max(max_x, cell.x + 1))
+		max_y = int(max(max_y, cell.y + 1))
 		var coord := Vector2(cell.x, cell.y)
 		var rot: int = cell.rot
 		var tile: Tile = tile_registry.by_id(cell.id)
 		
 		if tile.is_background():
 			_base.set_cellv(coord, _floor_id)
+			mask_cells[coord] = MaskType.FULL
+			if not mask_cells.has(coord + Vector2.UP):
+				mask_cells[coord + Vector2.UP] = MaskType.HALF
 			
 			for v in SURROUND_DIRS:
 				if _base.get_cellv(coord + v) == TileMap.INVALID_CELL:
@@ -86,5 +102,32 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 				
 				var layer: YSort = _l1 if has_l0 else _l0
 				layer.add_child(instance)
-	for tm in [_base, _ceiling]:
-		tm.update_bitmask_region()
+	
+	_base.update_bitmask_region()
+	
+	# Build the full interior mask for this ship.
+	var mask_image: Image = Image.new()
+	mask_image.create(max_x * 2, max_y * 2, false, Image.FORMAT_RGBA8)
+	mask_image.lock()
+	for x in range(max_x):
+		for y in range(max_y):
+			if mask_cells.has(Vector2(x, y)):
+				match mask_cells[Vector2(x, y)]:
+					MaskType.FULL:
+						mask_image.set_pixel(x * 2, y * 2, Color.black)
+						mask_image.set_pixel(x * 2, y * 2 + 1, Color.black)
+						mask_image.set_pixel(x * 2 + 1, y * 2, Color.black)
+						mask_image.set_pixel(x * 2 + 1, y * 2 + 1, Color.black)
+					
+					MaskType.HALF:
+						mask_image.set_pixel(x * 2, y * 2 + 1, Color.black)
+						mask_image.set_pixel(x * 2 + 1, y * 2 + 1, Color.black)
+	mask_image.unlock()
+	
+	mask.create_from_image(mask_image, 0)
+	_wrap.region_rect.position = Vector2(0, -1) * CELL_SIZE
+	_wrap.region_rect.end = Vector2(max_x, max_y) * CELL_SIZE
+	_wrap.position = Vector2(0, -1) * CELL_SIZE
+	_wrap.material.set_shader_param("alpha_mask", mask)
+	_wrap.material.set_shader_param("cell_size", float(CELL_SIZE / 2))
+	#_wrap.texture = mask
