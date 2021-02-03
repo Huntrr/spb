@@ -18,7 +18,6 @@ func _ready():
 func _setup():
 	if object_tile.placement_type == \"OUT\":
 		texture = out_texture
-		print(object_tile.bg_dirs)
 		if not object_tile.bg_dirs.empty():
 			rotation = Rotation.get_yaw(
 				Rotation.from_dir(-object_tile.bg_dirs[0]))
