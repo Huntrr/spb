@@ -43,6 +43,12 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 			var position: Vector2 = coord * CELL_SIZE + Vector2.ONE * CELL_SIZE / 2
 			var width := 1
 			var height := 1
+			
+			var bg_dirs := []
+			for v in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
+				if blueprint.has_background(coord + v):
+					bg_dirs.append(v)
+			
 			if tile.blueprint_placement.rotate_like_door:
 				# Doors should be drawn as a single object.
 				var next = Rotation.get_dir(rot).abs()
@@ -66,7 +72,7 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 				var type := "IN"
 				var instance: ObjectTile = (
 					tile.ship_placement.object.instance().init(
-						rot, type, width, height))
+						rot, type, width, height, bg_dirs))
 				instance.position = position
 				_l0.add_child(instance)
 				has_l0 = true
@@ -75,7 +81,7 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 				var type := "UP" if blueprint.has_background(coord) else "OUT"
 				var instance: ObjectTile = (
 					tile.ship_placement.exterior_object.instance().init(
-					rot, type, width, height))
+					rot, type, width, height, bg_dirs))
 				instance.position = position
 				
 				var layer: YSort = _l1 if has_l0 else _l0

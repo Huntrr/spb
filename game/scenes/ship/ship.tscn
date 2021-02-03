@@ -26,4 +26,3 @@ __meta__ = {
 }
 
 [node name="Layer1" type="YSort" parent="."]
-visible = false

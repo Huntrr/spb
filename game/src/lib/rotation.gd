@@ -33,3 +33,19 @@ static func get_dir(cur: int) -> Vector2:
 		LEFT:
 			return Vector2.LEFT
 	return Vector2.ZERO
+
+
+
+
+static func from_dir(dir: Vector2) -> int:
+	match dir:
+		Vector2.DOWN:
+			return DOWN
+		Vector2.RIGHT:
+			return RIGHT
+		Vector2.UP:
+			return UP
+		Vector2.LEFT:
+			return LEFT
+	push_error("Invalid dir %s" % dir)
+	return -1
