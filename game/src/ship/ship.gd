@@ -13,9 +13,10 @@ const SURROUND_DIRS := [
 const tile_registry: TileRegistry = preload("res://data/tiles/tile_registry.tres")
 
 onready var _base: TileMap = $Base
-onready var _l0: YSort = $Layer0
+onready var _in: YSort = $In
 onready var _wrap: Sprite = $Wrap
-onready var _l1: YSort = $Layer1
+onready var _up: YSort = $Up
+onready var _out: YSort = $Out
 
 onready var _floor_id: int = _base.tile_set.find_tile_by_name(FLOOR_TILE_NAME)
 onready var _wall_id: int = _base.tile_set.find_tile_by_name(WALL_TILE_NAME)
@@ -28,7 +29,7 @@ enum MaskType {
 var mask: Texture = ImageTexture.new()
 
 func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
-	for container in [_base, _l0, _wrap, _l1]:
+	for container in [_base, _in, _wrap, _up, _out]:
 		for child in container.get_children():
 			child.queue_free()
 		if container is TileMap:
@@ -90,8 +91,7 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 					tile.ship_placement.object.instance().init(
 						rot, type, width, height, bg_dirs))
 				instance.position = position
-				_l0.add_child(instance)
-				has_l0 = true
+				_in.add_child(instance)
 			
 			if tile.ship_placement.exterior_object != null:
 				var type := "UP" if blueprint.has_background(coord) else "OUT"
@@ -100,7 +100,7 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 					rot, type, width, height, bg_dirs))
 				instance.position = position
 				
-				var layer: YSort = _l1 if has_l0 else _l0
+				var layer: YSort = _up if type == "UP" else _out
 				layer.add_child(instance)
 	
 	_base.update_bitmask_region()
@@ -125,9 +125,11 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 	mask_image.unlock()
 	
 	mask.create_from_image(mask_image, 0)
+	var mask_ratio: Vector2 = _wrap.texture.get_size() / mask.get_size();
+	
 	_wrap.region_rect.position = Vector2(0, -1) * CELL_SIZE
 	_wrap.region_rect.end = Vector2(max_x, max_y) * CELL_SIZE
 	_wrap.position = Vector2(0, -1) * CELL_SIZE
 	_wrap.material.set_shader_param("alpha_mask", mask)
 	_wrap.material.set_shader_param("cell_size", float(CELL_SIZE / 2))
-	#_wrap.texture = mask
+	_wrap.material.set_shader_param("mask_ratio", mask_ratio)

@@ -9,17 +9,19 @@ code = "shader_type canvas_item;
 
 uniform sampler2D alpha_mask : hint_albedo;
 uniform float cell_size;
+uniform vec2 mask_ratio;
 
-void fragment(){
+void fragment() {
   //COLOR = vec4(texture(TEXTURE, UV).rgb, texture(alpha_mask, UV / cell_size).a);
   //COLOR = vec4(0, 1.0 - texture(alpha_mask, UV / cell_size).b, 0, texture(alpha_mask, UV / cell_size).a);
-  float alpha = texture(alpha_mask, UV / cell_size).a;
-  COLOR = vec4(1, 0, 0, alpha);
+  float alpha = texture(alpha_mask, UV * mask_ratio / cell_size).a;
+  COLOR = vec4(texture(TEXTURE, UV).rgb, alpha);
 }"
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
 shader_param/cell_size = 16.0
+shader_param/mask_ratio = null
 
 [node name="Ship" type="Node2D"]
 script = ExtResource( 2 )
@@ -33,7 +35,7 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="Layer0" type="YSort" parent="."]
+[node name="In" type="YSort" parent="."]
 __meta__ = {
 "_edit_lock_": true
 }
@@ -44,9 +46,16 @@ texture = ExtResource( 3 )
 centered = false
 region_enabled = true
 region_rect = Rect2( 0, 0, 64, 64 )
+__meta__ = {
+"_edit_lock_": true
+}
 
-[node name="Layer1" type="YSort" parent="."]
-visible = false
+[node name="Up" type="YSort" parent="."]
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Out" type="YSort" parent="."]
 __meta__ = {
 "_edit_lock_": true
 }
