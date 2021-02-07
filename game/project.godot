@@ -40,6 +40,11 @@ _global_script_classes=[ {
 "path": "res://src/resources/spaceship_blueprint.gd"
 }, {
 "base": "Resource",
+"class": "SubtitleOptions",
+"language": "GDScript",
+"path": "res://src/resources/subtitle_options.gd"
+}, {
+"base": "Resource",
 "class": "Tile",
 "language": "GDScript",
 "path": "res://src/resources/tiles/tile.gd"
@@ -48,6 +53,11 @@ _global_script_classes=[ {
 "class": "TileRegistry",
 "language": "GDScript",
 "path": "res://src/resources/tiles/tile_registry.gd"
+}, {
+"base": "Resource",
+"class": "VersionInfo",
+"language": "GDScript",
+"path": "res://src/resources/version_info.gd"
 } ]
 _global_script_class_icons={
 "BlueprintPlacement": "",
@@ -56,8 +66,10 @@ _global_script_class_icons={
 "Ship": "",
 "ShipPlacement": "",
 "SpaceshipBlueprint": "",
+"SubtitleOptions": "",
 "Tile": "",
-"TileRegistry": ""
+"TileRegistry": "",
+"VersionInfo": ""
 }
 
 [application]

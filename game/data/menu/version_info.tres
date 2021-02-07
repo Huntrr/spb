@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://src/resources/version_info.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+major = 0
+minor = 0
+patch = 1
+adjective = "awesome"
+codename = "asteroid"
