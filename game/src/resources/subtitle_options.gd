@@ -18,4 +18,4 @@ func _gen_title() -> String:
 	var s_ = s[randi() % s.size()]
 	var p_ = p[randi() % p.size()]
 	var b_ = b[randi() % b.size()]
-	return "%s %s %s" % [s_, p_, b_]
+	return "%s %s %s?!" % [s_, p_, b_]

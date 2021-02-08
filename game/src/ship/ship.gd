@@ -105,18 +105,19 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 	
 	_base.update_bitmask_region()
 	
+	print(mask_cells)
 	# Build the full interior mask for this ship.
 	var mask_image: Image = Image.new()
-	mask_image.create(max_x * 2, max_y * 2, false, Image.FORMAT_RGBA8)
+	mask_image.create(max_x * 2, max_y * 2 + 2, false, Image.FORMAT_RGBA8)
 	mask_image.lock()
 	for x in range(max_x):
-		for y in range(max_y):
-			if mask_cells.has(Vector2(x, y)):
-				match mask_cells[Vector2(x, y)]:
+		for y in range(max_y + 1):
+			if mask_cells.has(Vector2(x, y - 1)):
+				match mask_cells[Vector2(x, y - 1)]:
 					MaskType.FULL:
 						mask_image.set_pixel(x * 2, y * 2, Color.black)
-						mask_image.set_pixel(x * 2, y * 2 + 1, Color.black)
 						mask_image.set_pixel(x * 2 + 1, y * 2, Color.black)
+						mask_image.set_pixel(x * 2, y * 2 + 1, Color.black)
 						mask_image.set_pixel(x * 2 + 1, y * 2 + 1, Color.black)
 					
 					MaskType.HALF:
@@ -128,8 +129,8 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 	var mask_ratio: Vector2 = _wrap.texture.get_size() / mask.get_size();
 	
 	_wrap.region_rect.position = Vector2(0, -1) * CELL_SIZE
-	_wrap.region_rect.end = Vector2(max_x, max_y) * CELL_SIZE
-	_wrap.position = Vector2(0, -1) * CELL_SIZE
+	_wrap.region_rect.end = Vector2(max_x, max_y + 1) * CELL_SIZE
+	_wrap.position = Vector2(0, -2) * CELL_SIZE
 	_wrap.material.set_shader_param("alpha_mask", mask)
 	_wrap.material.set_shader_param("cell_size", float(CELL_SIZE / 2))
 	_wrap.material.set_shader_param("mask_ratio", mask_ratio)

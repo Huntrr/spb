@@ -21,6 +21,11 @@ func _get_configuration_warning() -> String:
 
 func _ready() -> void:
 	_update_subtitle()
+	var count := 0
+	while count < 10:
+		yield(get_tree().create_timer(0.5), \"timeout\")
+		_update_subtitle()
+		count += 1
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton: 
@@ -63,7 +68,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 texture = ExtResource( 8 )
 expand = true
-stretch_mode = 6
+stretch_mode = 7
 __meta__ = {
 "_edit_use_anchors_": false
 }

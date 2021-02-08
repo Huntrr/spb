@@ -6,4 +6,4 @@
 script = ExtResource( 1 )
 s = [ "space" ]
 p = [ "pirate" ]
-b = [ "battle", "barter", "builder", "bonanza", "basketball", "blast-off", "blitz", "businessman", "bee-keeper" ]
+b = [ "battle", "barter", "builder", "bonanza", "basketball", "blast-off", "blitz", "businesswoman", "bee-keeper", "baby", "bureaucracy", "beagle", "bibliography" ]
