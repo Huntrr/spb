@@ -41,6 +41,7 @@ __meta__ = {
 }
 
 [node name="Wrap" type="Sprite" parent="."]
+visible = false
 material = SubResource( 2 )
 texture = ExtResource( 3 )
 centered = false
@@ -51,6 +52,7 @@ __meta__ = {
 }
 
 [node name="Up" type="YSort" parent="."]
+visible = false
 __meta__ = {
 "_edit_lock_": true
 }

@@ -77,6 +77,10 @@ _global_script_class_icons={
 config/name="SPB"
 config/icon="res://icon.png"
 
+[autoload]
+
+Connection="*res://src/lib/connection.gd"
+
 [display]
 
 window/stretch/mode="viewport"

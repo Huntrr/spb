@@ -1,4 +1,7 @@
 bin/
+*~
+# Ignore Vim swap files.
+.*.swp
 
 # Godot-specific ignores
 .import/
@@ -11,3 +14,11 @@ export_presets.cfg
 # Mono-specific ignores
 .mono/
 data_*/
+
+# Ignore secret *_env.sh bash files
+*_env.sh
+
+# Bazel
+/bazel-*
+
+.ropeproject/

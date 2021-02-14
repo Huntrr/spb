@@ -1,0 +1,15 @@
+absl-py==0.11.0
+# Usage: Flags and logging.
+# License: Apache 2.0
+
+dnspython==2.1.0
+# Usage: Connecting to MongoDB.
+# License: ISC
+
+Flask==1.1.2
+# Usage: Web server.
+# License: BSD 3-Clause
+
+mongoengine==0.22.1
+# Usage: MongoDB ORM.
+# License: MIT

@@ -1,6 +1,5 @@
 [gd_scene load_steps=11 format=2]
 
-[ext_resource path="res://src/utils/ui/rich_text.gd" type="Script" id=1]
 [ext_resource path="res://assets/fonts/body.tres" type="DynamicFont" id=2]
 [ext_resource path="res://assets/fonts/default.tres" type="DynamicFont" id=3]
 [ext_resource path="res://assets/fonts/default-small.tres" type="DynamicFont" id=4]
@@ -12,20 +11,25 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Label
 
-export(Resource) var subtitle_options
+export(Resource) var _subtitle_options
+
+export(float) var _size_spring = 2
+export(float) var _size_k = 20
+
+export(float) var _rot_spring = 100
+export(float) var _rot_k = 20
+export(float) var _rot_dampen = 0.1
+
+var _v_size = 0
+var _v_rot = 0
 
 func _get_configuration_warning() -> String:
-	if not (subtitle_options is SubtitleOptions):
+	if not (_subtitle_options is SubtitleOptions):
 		return \"subtitle_options must be a SubtitleOptins\"
 	return \"\"
 
 func _ready() -> void:
 	_update_subtitle()
-	var count := 0
-	while count < 10:
-		yield(get_tree().create_timer(0.5), \"timeout\")
-		_update_subtitle()
-		count += 1
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton: 
@@ -33,7 +37,66 @@ func _gui_input(event: InputEvent) -> void:
 			_update_subtitle()
 
 func _update_subtitle() -> void:
-	set_text(subtitle_options.get_title(text))
+	_pop(_subtitle_options.get_title(text))
+
+func _pop(new_text: String) -> void:
+	set_text(new_text)
+	rect_scale = Vector2.ONE
+	rect_rotation = 0
+	rect_pivot_offset = rect_size / 2
+	_v_size = _size_spring
+	_v_rot = _rot_spring * pow(-1, randi() % 2)
+
+func _process(delta: float) -> void:
+	rect_scale += Vector2.ONE * _v_size * delta
+	rect_rotation += _v_rot * delta
+	
+	_v_size -= _size_k * (rect_scale.x - 1) * delta
+	_v_rot -= _rot_k * (rect_rotation) * delta
+	
+	if rect_scale.x < 1:
+		rect_scale = Vector2.ONE
+	rect_rotation *= pow(_rot_dampen, delta)
+"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends MarginContainer
+
+const NewsItem: PackedScene = preload(\"res://scenes/menu/news_item.tscn\")
+
+onready var _container: VBoxContainer = (
+	$Panel/VBoxContainer/ScrollContainer/VBoxContainer)
+
+
+func _ready():
+	assert($HTTPRequest.connect(\"request_completed\", self, \"_on_request_completed\") == OK)
+	$HTTPRequest.request(\"%s/news\" % Connection.addresses().auth)
+
+
+func _on_request_completed(_result, response_code, _headers, body) -> void:
+	for news_item_node in _container.get_children():
+		news_item_node.queue_free()
+	
+	if response_code != 200:
+		_make_news(\"Error\", \"\", \"Error loading news.\")
+		return
+	var news = JSON.parse(body.get_string_from_utf8()).result
+	
+	if news.empty():
+		_make_news(\"No news!\", \"\", \"Good news?\")
+		return
+
+	for news_item in news:
+		_make_news(news_item.title, news_item.date, news_item.content)
+
+
+func _make_news(title: String, date: String, content: String) -> void:
+	var news_item = NewsItem.instance().init(title, date, content)
+	_container.add_child(news_item)
+
+
+func _show_error(text: String) -> void:
+	_make_news(\"Error\", \"\", text)
 "
 
 [sub_resource type="GDScript" id=2]
@@ -116,25 +179,25 @@ text = "subtitle"
 align = 1
 uppercase = true
 script = SubResource( 1 )
-subtitle_options = ExtResource( 7 )
+_subtitle_options = ExtResource( 7 )
 
 [node name="Content" type="HBoxContainer" parent="Main"]
 margin_top = 147.0
 margin_right = 1004.0
-margin_bottom = 715.0
+margin_bottom = 580.0
 size_flags_vertical = 3
 
 [node name="CenterContainer" type="CenterContainer" parent="Main/Content"]
 margin_right = 500.0
-margin_bottom = 568.0
+margin_bottom = 433.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Login" type="VBoxContainer" parent="Main/Content/CenterContainer"]
 margin_left = 150.0
-margin_top = 90.0
+margin_top = 23.0
 margin_right = 350.0
-margin_bottom = 477.0
+margin_bottom = 410.0
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 3
 
@@ -277,60 +340,54 @@ __meta__ = {
 modulate = Color( 1, 1, 1, 0.776471 )
 margin_left = 504.0
 margin_right = 1004.0
-margin_bottom = 568.0
+margin_bottom = 433.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/margin_right = 20
 custom_constants/margin_top = 20
 custom_constants/margin_left = 20
 custom_constants/margin_bottom = 20
+script = SubResource( 3 )
 
 [node name="Panel" type="PanelContainer" parent="Main/Content/News"]
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 480.0
-margin_bottom = 548.0
+margin_bottom = 413.0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Main/Content/News/Panel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Main/Content/News/Panel"]
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 453.0
-margin_bottom = 521.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Main/Content/News/Panel/ScrollContainer"]
-margin_right = 446.0
-margin_bottom = 191.0
+margin_bottom = 386.0
 size_flags_horizontal = 3
-custom_constants/separation = 25
+custom_constants/separation = 10
 
-[node name="Header" type="Label" parent="Main/Content/News/Panel/ScrollContainer/VBoxContainer"]
+[node name="Header" type="Label" parent="Main/Content/News/Panel/VBoxContainer"]
 margin_right = 446.0
 margin_bottom = 16.0
 custom_fonts/font = ExtResource( 2 )
 text = "NEWS"
 align = 1
 
-[node name="NewsItem" type="VBoxContainer" parent="Main/Content/News/Panel/ScrollContainer/VBoxContainer"]
-margin_top = 41.0
+[node name="ScrollContainer" type="ScrollContainer" parent="Main/Content/News/Panel/VBoxContainer"]
+margin_top = 26.0
 margin_right = 446.0
-margin_bottom = 191.0
-rect_min_size = Vector2( 0, 150 )
-
-[node name="Title" type="Label" parent="Main/Content/News/Panel/ScrollContainer/VBoxContainer/NewsItem"]
-margin_right = 446.0
-margin_bottom = 16.0
-custom_fonts/font = ExtResource( 2 )
-text = "title"
-
-[node name="RichTextLabel" type="RichTextLabel" parent="Main/Content/News/Panel/ScrollContainer/VBoxContainer/NewsItem"]
-margin_top = 20.0
-margin_right = 446.0
-margin_bottom = 150.0
+margin_bottom = 379.0
+size_flags_horizontal = 3
 size_flags_vertical = 3
-bbcode_enabled = true
-bbcode_text = "content"
-text = "content"
-script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Main/Content/News/Panel/VBoxContainer/ScrollContainer"]
+margin_right = 446.0
+margin_bottom = 353.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 25
+
+[node name="HTTPRequest" type="HTTPRequest" parent="Main/Content/News"]
 
 [node name="Version" type="Label" parent="."]
 anchor_right = 0.191406
