@@ -113,7 +113,7 @@ func _on_request_completed(result, response_code, _headers, body) -> void:
 				\"Unknown authentication error.\")
 		return
 	
-	emit_signal(\"logged_in\", res.result.jwt)
+	print(res.result.jwt)
 "
 
 [sub_resource type="GDScript" id=4]
