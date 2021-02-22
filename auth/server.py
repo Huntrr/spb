@@ -28,6 +28,21 @@ def get_news() -> flask.Response:
     return flask.jsonify(formatted_items)
 
 
+@app.route('/login/guest')
+def login_guest() -> flask.Response:
+    pass
+
+
+@app.route('/login/spb')
+def login_spb() -> flask.Response:
+    pass
+
+
+@app.route('/register/spb')
+def register_spb() -> flask.Response:
+    pass
+
+
 def main(_) -> None:
     logging.info('Connecting to database')
     connect.connect()

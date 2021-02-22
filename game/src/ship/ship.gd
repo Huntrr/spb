@@ -83,7 +83,6 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 				else:
 					height = size 
 				
-			var has_l0 := false
 			if (tile.ship_placement.object != null and
 					blueprint.has_background(coord)):
 				var type := "IN"
@@ -105,7 +104,6 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 	
 	_base.update_bitmask_region()
 	
-	print(mask_cells)
 	# Build the full interior mask for this ship.
 	var mask_image: Image = Image.new()
 	mask_image.create(max_x * 2, max_y * 2 + 2, false, Image.FORMAT_RGBA8)
@@ -132,5 +130,5 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 	_wrap.region_rect.end = Vector2(max_x, max_y + 1) * CELL_SIZE
 	_wrap.position = Vector2(0, -2) * CELL_SIZE
 	_wrap.material.set_shader_param("alpha_mask", mask)
-	_wrap.material.set_shader_param("cell_size", float(CELL_SIZE / 2))
+	_wrap.material.set_shader_param("cell_size", float(CELL_SIZE / 2.0))
 	_wrap.material.set_shader_param("mask_ratio", mask_ratio)
