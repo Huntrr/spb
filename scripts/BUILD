@@ -7,5 +7,5 @@ py_binary(
     deps = [
         "//db:connect",
         "//db/models:news",
-    ]
+    ],
 )

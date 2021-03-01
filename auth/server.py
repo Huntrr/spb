@@ -6,7 +6,8 @@ from absl import flags, logging
 import flask
 
 from db import connect
-from db.models import news
+from db.models import news, user
+from util import error
 
 flags.DEFINE_integer('port', 30202, 'Port to use for the auth server.')
 
@@ -28,19 +29,24 @@ def get_news() -> flask.Response:
     return flask.jsonify(formatted_items)
 
 
-@app.route('/login/guest')
+@app.route('/login/guest', methods=['POST'])
 def login_guest() -> flask.Response:
-    pass
+    logging.info(flask.request.json)
+    the_user = user.GuestUser(name=flask.request.json['name'])
+    the_user.save()
+    return dict(jwt=the_user.get_jwt())
 
 
-@app.route('/login/spb')
+@app.route('/login/spb', methods=['POST'])
 def login_spb() -> flask.Response:
-    pass
+    logging.info(flask.request.json)
+    return error.error('error msg')
 
 
-@app.route('/register/spb')
+@app.route('/register/spb', methods=['POST'])
 def register_spb() -> flask.Response:
-    pass
+    logging.info(flask.request.json)
+    return error.error('error msg')
 
 
 def main(_) -> None:

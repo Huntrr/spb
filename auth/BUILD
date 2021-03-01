@@ -7,7 +7,18 @@ py_binary(
     deps = [
         "//db:connect",
         "//db/models:news",
+        "//db/models:user",
+        "//util:error",
         requirement("absl-py"),
         requirement("Flask"),
-    ]
+    ],
+)
+
+py_library(
+    name = "security",
+    srcs = ["security.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("passlib"),
+    ],
 )
