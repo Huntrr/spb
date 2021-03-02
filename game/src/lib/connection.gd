@@ -9,9 +9,57 @@ const dict = {
 		"auth": "http://0.0.0.0:30202"
 	}
 }
+const SESSION_PATH = "user://session.dat"
+
+var _session_jwt: String = ""
+var session_user: Dictionary = {}
 
 func addresses() -> Dictionary:
 	return dict[environment]
+
+
+func _ready() -> void:
+	var file = File.new()
+	if file.open(SESSION_PATH, File.READ) == OK:
+		var text = file.get_as_text()
+		if text.empty():
+			_session_jwt = ""
+			session_user = {}
+		else:
+			assert(set_session(file.get_as_text()).ok())
+		file.close()
+
+
+func logged_in() -> bool:
+	return not session_user.empty()
+
+
+func clear_session() -> void:
+	_session_jwt = ""
+	session_user = {}
+	
+	var file = File.new()
+	file.open(SESSION_PATH, File.WRITE)
+	file.store_string("")
+	file.close()
+
+
+func set_session(jwt: String) -> Status:
+	_session_jwt = jwt
+	var encoded_user: String = jwt.split('.')[1]
+	var str_user: String = Marshalls.base64_to_utf8(encoded_user) + "}"
+	var json_user: JSONParseResult = JSON.parse(str_user)
+	if json_user.error != OK:
+		return Status.new(Status.INTERNAL, "Unable to parse JWT")
+	
+	session_user = json_user.result
+	
+	var file = File.new()
+	file.open(SESSION_PATH, File.WRITE)
+	file.store_string(jwt)
+	file.close()
+
+	return Status.new()
 
 
 func request(
@@ -50,8 +98,7 @@ func login_guest(name: String) -> Status:
 		return data_status.status
 	var data: Dictionary = data_status.value
 	
-	print(data)
-	return Status.new()
+	return set_session(data.jwt)
 
 
 func login_user(email: String, password: String) -> Status:
@@ -64,5 +111,4 @@ func login_user(email: String, password: String) -> Status:
 		return data_status.status
 	var data: Dictionary = data_status.value
 	
-	print(data)
-	return Status.new()
+	return set_session(data.jwt)

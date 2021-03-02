@@ -23,3 +23,5 @@ data_*/
 /bazel-*
 
 .ropeproject/
+secret/
+__pycache__/

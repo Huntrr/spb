@@ -1,18 +1,21 @@
 """
 Basic data model for a user.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import mongoengine as me
 
-from auth import security
+from auth import jwt_context, security
 from db.models import player
+
+_JWT_EXPIRE_TIME = timedelta(days=7)
 
 
 class User(me.Document):
     """Base model for all SPB users."""
     meta = {'allow_inheritance': True}
     last_active = me.DateTimeField(default=datetime.utcnow)
+    last_login = me.DateTimeField()
 
     # Game data for this user.
     player = me.EmbeddedDocumentField(player.Player, default=player.Player)
@@ -25,6 +28,13 @@ class User(me.Document):
     @classmethod
     def pre_save(cls, sender, document):
         document.last_active = datetime.utcnow()
+
+    @classmethod
+    def from_jwt(cls, jwt):
+        user = jwt_context.decode(jwt)
+        if user['issued'] < self.last_login:
+            raise ValueError('JWT has been expired.')
+        return cls.objects(id=me.ObjectId(user['id'])).first()
 
 # Hook up the pre_save signal.
 me.signals.pre_save.connect(User.pre_save, sender=User)
@@ -41,7 +51,11 @@ class GuestUser(User):
 
     def get_jwt(self) -> str:
         """Returns a JWT authenticating as this user."""
-        return ''
+        self.last_login = datetime.utcnow()
+        self.save()
+
+        user = dict(id=str(self.id), guest_id=self.guest_id, name=self.name)
+        return jwt_context.encode(user, _JWT_EXPIRE_TIME)
 
 
 class NonGuestUser(User):
@@ -75,7 +89,6 @@ class EmailUser(NonGuestUser):
         if len(password) < 8:
             raise ValueError('Password must be at least 8 characters')
         self.password_hash = security.pwd_context.hash(password)
-        self.save()
 
     def activate_email(self, verification_code: str) -> None:
         """Activates this user's email if the |verification| code is correct."""
@@ -94,4 +107,12 @@ class EmailUser(NonGuestUser):
         if not self.password_matches(password):
             raise ValueError('Incorrect password.')
 
-        return ''
+        self.last_login = datetime.utcnow()
+        self.save()
+
+        user = dict(
+            id=str(self.id),
+            user_id=self.user_id,
+            email=self.email,
+            name=self.name)
+        return jwt_context.encode(user, _JWT_EXPIRE_TIME)

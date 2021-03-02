@@ -34,6 +34,7 @@ py_library(
     deps = [
         ":player",
         "//auth:security",
+        "//auth:jwt_context",
         requirement("blinker"),
         requirement("mongoengine"),
     ],

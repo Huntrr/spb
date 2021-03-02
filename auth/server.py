@@ -31,7 +31,6 @@ def get_news() -> flask.Response:
 
 @app.route('/login/guest', methods=['POST'])
 def login_guest() -> flask.Response:
-    logging.info(flask.request.json)
     the_user = user.GuestUser(name=flask.request.json['name'])
     the_user.save()
     return dict(jwt=the_user.get_jwt())

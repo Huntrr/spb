@@ -18,6 +18,10 @@ grpcio==1.36.0
 # Usage: Error codes.
 # License: Apache 2.0
 
+jwt==1.2.0
+# Usage: JWT encode and decode.
+# License: Apache 2.0
+
 mongoengine==0.22.1
 # Usage: MongoDB ORM.
 # License: MIT

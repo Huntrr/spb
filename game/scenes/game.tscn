@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Label
+
+
+func _ready():
+	if Connection.session_user.empty():
+		set_text(\"Not logged in\")
+	else:
+		set_text(Connection.session_user.name)
+"
+
+[node name="Node" type="Node"]
+
+[node name="Control" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Control"]
+margin_right = 40.0
+margin_bottom = 14.0
+text = "username"
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
