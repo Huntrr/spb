@@ -241,7 +241,7 @@ func _ready():
 	assert(connect(\"button_up\", self, \"_on_press\") == OK)
 
 func _on_press() -> void:
-	Connection.log_out(Status.new(10, \"eror\"))
+	Connection.log_out()
 "
 
 [sub_resource type="GDScript" id=12]
