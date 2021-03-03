@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://assets/fonts/body.tres" type="DynamicFont" id=2]
 [ext_resource path="res://assets/fonts/default.tres" type="DynamicFont" id=3]
@@ -59,7 +59,7 @@ func _process(delta: float) -> void:
 	rect_rotation *= pow(_rot_dampen, delta)
 "
 
-[sub_resource type="GDScript" id=12]
+[sub_resource type="GDScript" id=2]
 script/source = "extends CenterContainer
 
 
@@ -72,11 +72,8 @@ func _ready():
 		$ContinueAs.hide()
 "
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=3]
 script/source = "extends VBoxContainer
-
-export(NodePath) var _error_dialog_path
-onready var _error_dialog: WindowDialog = get_node(_error_dialog_path)
 
 onready var _guest_login: Node = $GuestLogin
 onready var _spb_login: Node = $UserLogin
@@ -102,19 +99,20 @@ func _on_attempt_login(type: String, body: Dictionary) -> void:
 			body.name
 		), \"completed\")
 	else:
-		_error_dialog.show_error(Status.UNKNOWN, \"???\")
+		ErrorDialog.show_error(Status.new(Status.UNKNOWN, \"???\"))
 	
 	if not status.ok():
-		_error_dialog.show_error(status.code, status.message)
+		ErrorDialog.show_error(status)
 		return
 	
-	assert(get_tree().change_scene(\"res://scenes/game.tscn\") == OK)
+	SceneManager.goto(\"res://scenes/game.tscn\")
 
 func _on_attempt_register(type: String, body: Dictionary) -> void:
-	_error_dialog.show_error(0, \"Error submitting register request...\")
+	ErrorDialog.show_error(
+		Status.new(Status.UNKNOWN, \"Error submitting register request...\"))
 "
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=4]
 script/source = "extends MarginContainer
 
 signal attempt_login(type, body)
@@ -133,7 +131,7 @@ func _on_login() -> void:
 	emit_signal(\"attempt_login\", \"guest\", body)
 "
 
-[sub_resource type="GDScript" id=13]
+[sub_resource type="GDScript" id=5]
 script/source = "extends LineEdit
 
 onready var login_button: Button = $\"../Login\"
@@ -141,11 +139,11 @@ onready var login_button: Button = $\"../Login\"
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventKey:
-		if event.is_action(\"ui_accept\"):
+		if event.is_action_pressed(\"ui_accept\"):
 			login_button.emit_signal(\"button_up\")
 "
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=6]
 script/source = "extends MarginContainer
 
 signal attempt_login(type, body)
@@ -185,7 +183,7 @@ func _on_attempt_register(email: String, username: String, password: String) -> 
 	})
 "
 
-[sub_resource type="GDScript" id=14]
+[sub_resource type="GDScript" id=7]
 script/source = "extends LineEdit
 
 onready var login_button: Button = $\"../HBoxContainer/Login\"
@@ -193,11 +191,11 @@ onready var login_button: Button = $\"../HBoxContainer/Login\"
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventKey:
-		if event.is_action(\"ui_accept\"):
+		if event.is_action_pressed(\"ui_accept\"):
 			login_button.emit_signal(\"button_up\")
 "
 
-[sub_resource type="GDScript" id=15]
+[sub_resource type="GDScript" id=8]
 script/source = "extends LineEdit
 
 onready var login_button: Button = $\"../HBoxContainer/Login\"
@@ -205,7 +203,7 @@ onready var login_button: Button = $\"../HBoxContainer/Login\"
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventKey:
-		if event.is_action(\"ui_accept\"):
+		if event.is_action_pressed(\"ui_accept\"):
 			login_button.emit_signal(\"button_up\")
 "
 
@@ -232,7 +230,7 @@ func _ready():
 	assert(connect(\"button_up\", self, \"_on_press\") == OK)
 
 func _on_press() -> void:
-	assert(get_tree().change_scene(\"res://scenes/game.tscn\") == OK)
+	SceneManager.goto(\"res://scenes/game.tscn\")
 "
 
 [sub_resource type="GDScript" id=11]
@@ -243,11 +241,10 @@ func _ready():
 	assert(connect(\"button_up\", self, \"_on_press\") == OK)
 
 func _on_press() -> void:
-	Connection.clear_session()
-	assert(get_tree().change_scene(\"res://scenes/menu/login.tscn\") == OK)
+	Connection.log_out(Status.new(10, \"eror\"))
 "
 
-[sub_resource type="GDScript" id=5]
+[sub_resource type="GDScript" id=12]
 script/source = "extends MarginContainer
 
 const NewsItem: PackedScene = preload(\"res://scenes/menu/news_item.tscn\")
@@ -287,7 +284,7 @@ func _show_error(text: String) -> void:
 	_make_news(\"Error\", \"\", text)
 "
 
-[sub_resource type="GDScript" id=6]
+[sub_resource type="GDScript" id=13]
 script/source = "extends Label
 
 export(Resource) var version_info
@@ -306,34 +303,10 @@ func _ready():
 	set_text(\"v%d.%d.%d - %s %s\" % [major, minor, patch, adjective, codename])
 "
 
-[sub_resource type="GDScript" id=7]
-script/source = "extends WindowDialog
-
-
-func _ready() -> void:
-	assert(
-		$MarginContainer/VBoxContainer/Button.connect(
-			\"button_up\", self, \"hide\") == OK)
-
-
-func show_error(code: int, message: String) -> void:
-	if code > 0:
-		window_title = \"Error %d\" % code
-	else:
-		window_title = \"Error!\"
-	
-	$MarginContainer/VBoxContainer/Label.text = message
-	
-	popup()
-"
-
-[sub_resource type="GDScript" id=8]
+[sub_resource type="GDScript" id=15]
 script/source = "extends WindowDialog
 
 signal attempt_register(email, name, password)
-
-export(NodePath) var _error_dialog_path
-onready var _error_dialog: WindowDialog = get_node(_error_dialog_path)
 
 onready var _email: LineEdit = $MarginContainer/VBoxContainer/Email
 onready var _name: LineEdit = $MarginContainer/VBoxContainer/Name
@@ -353,8 +326,9 @@ func show_register(email: String, password: String) -> void:
 
 func _on_register() -> void:
 	if _password1.text != _password2.text:
-		_error_dialog.show_error(0,
-			\"Registration error: Passwords don't match!\")
+		ErrorDialog.show_error(Status.new(Status.FAILED_PRECONDITION,
+			\"Registration error: Passwords don't match!\"))
+		return
 	
 	emit_signal(\"attempt_register\", _email.text, _name.text, _password1.text)
 "
@@ -433,7 +407,7 @@ margin_right = 500.0
 margin_bottom = 433.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = SubResource( 12 )
+script = SubResource( 2 )
 
 [node name="Login" type="VBoxContainer" parent="Main/Content/CenterContainer"]
 margin_left = 150.0
@@ -442,14 +416,13 @@ margin_right = 350.0
 margin_bottom = 364.0
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 3
-script = SubResource( 2 )
-_error_dialog_path = NodePath("../../../../ErrorDialog")
+script = SubResource( 3 )
 
 [node name="GuestLogin" type="MarginContainer" parent="Main/Content/CenterContainer/Login"]
 margin_right = 200.0
 margin_bottom = 95.0
 size_flags_horizontal = 3
-script = SubResource( 3 )
+script = SubResource( 4 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Main/Content/CenterContainer/Login/GuestLogin"]
 margin_right = 200.0
@@ -464,7 +437,7 @@ rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 3 )
 placeholder_text = "Guest Name"
-script = SubResource( 13 )
+script = SubResource( 5 )
 
 [node name="Login" type="Button" parent="Main/Content/CenterContainer/Login/GuestLogin/VBoxContainer"]
 margin_top = 55.0
@@ -482,7 +455,7 @@ margin_top = 99.0
 margin_right = 200.0
 margin_bottom = 296.0
 custom_constants/margin_top = 15
-script = SubResource( 4 )
+script = SubResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -508,7 +481,7 @@ margin_bottom = 72.0
 rect_min_size = Vector2( 0, 40 )
 custom_fonts/font = ExtResource( 3 )
 placeholder_text = "Email"
-script = SubResource( 14 )
+script = SubResource( 7 )
 
 [node name="Password" type="LineEdit" parent="Main/Content/CenterContainer/Login/UserLogin/VBoxContainer"]
 margin_top = 87.0
@@ -518,7 +491,7 @@ rect_min_size = Vector2( 0, 40 )
 custom_fonts/font = ExtResource( 3 )
 secret = true
 placeholder_text = "Password"
-script = SubResource( 15 )
+script = SubResource( 8 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Main/Content/CenterContainer/Login/UserLogin/VBoxContainer"]
 margin_top = 142.0
@@ -639,7 +612,7 @@ custom_constants/margin_right = 20
 custom_constants/margin_top = 20
 custom_constants/margin_left = 20
 custom_constants/margin_bottom = 20
-script = SubResource( 5 )
+script = SubResource( 12 )
 
 [node name="Panel" type="PanelContainer" parent="Main/Content/News"]
 margin_left = 20.0
@@ -688,63 +661,11 @@ margin_left = 10.0
 margin_bottom = -5.0
 text = "version string"
 valign = 2
-script = SubResource( 6 )
+script = SubResource( 13 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 version_info = ExtResource( 6 )
-
-[node name="ErrorDialog" type="WindowDialog" parent="."]
-anchor_left = 0.35
-anchor_top = 0.4
-anchor_right = 0.65
-anchor_bottom = 0.65
-custom_fonts/title_font = ExtResource( 4 )
-popup_exclusive = true
-window_title = "Error!"
-script = SubResource( 7 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="MarginContainer" type="MarginContainer" parent="ErrorDialog"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-custom_constants/margin_right = 10
-custom_constants/margin_top = 10
-custom_constants/margin_left = 10
-custom_constants/margin_bottom = 10
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="VBoxContainer" type="VBoxContainer" parent="ErrorDialog/MarginContainer"]
-margin_left = 10.0
-margin_top = 10.0
-margin_right = 297.0
-margin_bottom = 140.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="ErrorDialog/MarginContainer/VBoxContainer"]
-margin_right = 287.0
-margin_bottom = 86.0
-size_flags_vertical = 3
-custom_fonts/font = ExtResource( 2 )
-text = "Test Error Content"
-align = 1
-valign = 1
-autowrap = true
-
-[node name="Button" type="Button" parent="ErrorDialog/MarginContainer/VBoxContainer"]
-margin_top = 90.0
-margin_right = 287.0
-margin_bottom = 130.0
-rect_min_size = Vector2( 120, 40 )
-size_flags_vertical = 4
-custom_fonts/font = ExtResource( 3 )
-text = "OK"
 
 [node name="Register" type="WindowDialog" parent="."]
 anchor_left = 0.3
@@ -755,11 +676,10 @@ margin_bottom = 192.0
 custom_fonts/title_font = ExtResource( 4 )
 popup_exclusive = true
 window_title = "Register"
-script = SubResource( 8 )
+script = SubResource( 15 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-_error_dialog_path = NodePath("../ErrorDialog")
 
 [node name="MarginContainer" type="MarginContainer" parent="Register"]
 anchor_right = 1.0

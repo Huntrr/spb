@@ -34,6 +34,14 @@ func logged_in() -> bool:
 	return not session_user.empty()
 
 
+func log_out(status: Status = Status.new()) -> void:
+	clear_session()
+	SceneManager.goto("res://scenes/menu/login.tscn")
+	call_deferred("_log_out_deferred")
+	if not status.ok():
+		ErrorDialog.show_error(status)
+
+
 func clear_session() -> void:
 	_session_jwt = ""
 	session_user = {}
@@ -47,7 +55,7 @@ func clear_session() -> void:
 func set_session(jwt: String) -> Status:
 	_session_jwt = jwt
 	var encoded_user: String = jwt.split('.')[1]
-	var str_user: String = Marshalls.base64_to_utf8(encoded_user) + "}"
+	var str_user: String = Base64Url.base64url_to_utf8(encoded_user)
 	var json_user: JSONParseResult = JSON.parse(str_user)
 	if json_user.error != OK:
 		return Status.new(Status.INTERNAL, "Unable to parse JWT")

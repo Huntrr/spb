@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Reference",
+"class": "Base64Url",
+"language": "GDScript",
+"path": "res://src/utils/string/base64url.gd"
+}, {
 "base": "Resource",
 "class": "BlueprintPlacement",
 "language": "GDScript",
@@ -75,6 +80,7 @@ _global_script_classes=[ {
 "path": "res://src/resources/version_info.gd"
 } ]
 _global_script_class_icons={
+"Base64Url": "",
 "BlueprintPlacement": "",
 "ObjectTile": "",
 "Response": "",
@@ -97,6 +103,8 @@ config/icon="res://icon.png"
 
 [autoload]
 
+SceneManager="*res://src/lib/scene_manager.gd"
+ErrorDialog="*res://src/lib/error_dialog.gd"
 Request="*res://src/lib/request.gd"
 Connection="*res://src/lib/connection.gd"
 
