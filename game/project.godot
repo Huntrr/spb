@@ -104,7 +104,7 @@ config/icon="res://icon.png"
 [autoload]
 
 SceneManager="*res://src/lib/scene_manager.gd"
-ErrorDialog="*res://src/lib/error_dialog.gd"
+Dialog="*res://src/lib/popup_dialog.gd"
 Request="*res://src/lib/request.gd"
 Connection="*res://src/lib/connection.gd"
 

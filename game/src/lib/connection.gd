@@ -39,7 +39,7 @@ func log_out(status: Status = Status.new()) -> void:
 	SceneManager.goto("res://scenes/menu/login.tscn")
 	call_deferred("_log_out_deferred")
 	if not status.ok():
-		ErrorDialog.show_error(status)
+		Dialog.show_error(status)
 
 
 func clear_session() -> void:
@@ -120,3 +120,15 @@ func login_user(email: String, password: String) -> Status:
 	var data: Dictionary = data_status.value
 	
 	return set_session(data.jwt)
+
+
+func register_user(email: String, name: String, password: String) -> Status:
+	var data_status: StatusOr = yield(request(
+		"auth", "register/spb", HTTPClient.METHOD_POST, {
+			"email": email,
+			"name": name,
+			"password": password,
+		}), "completed")
+	if not data_status.ok():
+		return data_status.status
+	return Status.new()

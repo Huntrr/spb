@@ -100,12 +100,14 @@ class EmailUser(NonGuestUser):
 
         self.email_date_verified = datetime.utcnow()
         self.email_verification_code = None
-        self.save()
 
     def get_jwt(self, password: str) -> str:
         """Returns a JWT authenticating as this user."""
         if not self.password_matches(password):
             raise ValueError('Incorrect password.')
+
+        if self.email_date_verified is None:
+            raise ValueError('User is not verified.')
 
         self.last_login = datetime.utcnow()
         self.save()

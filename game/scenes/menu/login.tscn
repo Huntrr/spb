@@ -99,17 +99,30 @@ func _on_attempt_login(type: String, body: Dictionary) -> void:
 			body.name
 		), \"completed\")
 	else:
-		ErrorDialog.show_error(Status.new(Status.UNKNOWN, \"???\"))
+		status = Status.new(Status.UNKNOWN, \"???\")
 	
 	if not status.ok():
-		ErrorDialog.show_error(status)
+		Dialog.show_error(status)
 		return
 	
 	SceneManager.goto(\"res://scenes/game.tscn\")
 
 func _on_attempt_register(type: String, body: Dictionary) -> void:
-	ErrorDialog.show_error(
-		Status.new(Status.UNKNOWN, \"Error submitting register request...\"))
+	var status: Status
+	if type == \"spb\":
+		status = yield(Connection.register_user(
+			body.email, body.username, body.password),
+			\"completed\")
+	else:
+		status = Status.new(Status.UNKNOWN, \"???\")
+	
+	if not status.ok():
+		Dialog.show_error(status)
+		return
+	
+	Dialog.show_message(
+		\"Registration\",
+		\"Please check your email for a verification code!\")
 "
 
 [sub_resource type="GDScript" id=4]
@@ -326,7 +339,7 @@ func show_register(email: String, password: String) -> void:
 
 func _on_register() -> void:
 	if _password1.text != _password2.text:
-		ErrorDialog.show_error(Status.new(Status.FAILED_PRECONDITION,
+		Dialog.show_error(Status.new(Status.FAILED_PRECONDITION,
 			\"Registration error: Passwords don't match!\"))
 		return
 	

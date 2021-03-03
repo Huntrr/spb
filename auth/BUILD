@@ -29,5 +29,6 @@ py_binary(
         "//util:error",
         requirement("absl-py"),
         requirement("Flask"),
+        requirement("grpcio"),
     ],
 )

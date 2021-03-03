@@ -1,9 +1,12 @@
 """
 Launcher for the auth server.
 """
+import uuid
+
 from absl import app as base_app
 from absl import flags, logging
 import flask
+import grpc
 
 from db import connect
 from db.models import news, user
@@ -38,14 +41,48 @@ def login_guest() -> flask.Response:
 
 @app.route('/login/spb', methods=['POST'])
 def login_spb() -> flask.Response:
-    logging.info(flask.request.json)
-    return error.error('error msg')
+    data = flask.request.json
+
+    the_user = user.EmailUser.objects(email=data['email']).first()
+    if the_user is None:
+        return error.error(
+            'Invalid email/password',
+            http_code=401,
+            spb_code=grpc.StatusCode.PERMISSION_DENIED)
+
+    return dict(jwt=the_user.get_jwt(data['password']))
 
 
 @app.route('/register/spb', methods=['POST'])
 def register_spb() -> flask.Response:
-    logging.info(flask.request.json)
+    verification_code = str(uuid.uuid4())
+
+    data = flask.request.json
+    the_user = user.EmailUser(
+        name=data['name'],
+        email=data['email'],
+        email_verification_code=verification_code)
+    the_user.set_password(data['password'])
+    the_user.save()
+
+    # TODO(hunter): Send email verification.
+
     return error.error('error msg')
+
+
+@app.route('/verify/spb', methods=['GET'])
+def verify_spb() -> flask.Response:
+    verification_code = str(uuid.uuid4())
+
+    data = flask.request.args
+    the_user = user.EmailUser.objects(id=me.ObjectId(data['id'])).first()
+    if the_user is None:
+        return 'Invalid user ID', 404
+
+    the_user.activate_email(data['code'])
+    the_user.save()
+
+    return f'Email {user.email} successfully verified'
 
 
 def main(_) -> None:
