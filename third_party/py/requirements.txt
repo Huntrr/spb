@@ -29,3 +29,7 @@ mongoengine==0.22.1
 passlib==1.7.4
 # Usage: Password hashing.
 # License: BSD
+
+sendgrid==6.6.0
+# Usage: Send user verification emails.
+# License: MIT

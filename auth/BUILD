@@ -2,6 +2,15 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("@py_deps//:requirements.bzl", "requirement")
 
 py_library(
+    name = "email",
+    srcs = ["email.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//lib:email_utils",
+    ],
+)
+
+py_library(
     name = "jwt_context",
     srcs = ["jwt_context.py"],
     visibility = ["//visibility:public"],
@@ -23,6 +32,7 @@ py_binary(
     name = "server",
     srcs = ["server.py"],
     deps = [
+        ":email",
         "//db:connect",
         "//db/models:news",
         "//db/models:user",

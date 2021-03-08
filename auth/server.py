@@ -8,6 +8,7 @@ from absl import flags, logging
 import flask
 import grpc
 
+from auth import email
 from db import connect
 from db.models import news, user
 from util import error
@@ -65,21 +66,21 @@ def register_spb() -> flask.Response:
     the_user.set_password(data['password'])
     the_user.save()
 
-    # TODO(hunter): Send email verification.
+    verification_link = flask.url_for(
+        'verify_spb', user=the_user.id, verification_code=verification_code)
+    email.send_verification_email(
+        the_user.email, the_user.name, verification_link)
 
-    return error.error('error msg')
+    return dict()
 
 
-@app.route('/verify/spb', methods=['GET'])
-def verify_spb() -> flask.Response:
-    verification_code = str(uuid.uuid4())
-
-    data = flask.request.args
-    the_user = user.EmailUser.objects(id=me.ObjectId(data['id'])).first()
+@app.route('/verify/spb/<str:user_id>/<str:verification_code>', methods=['GET'])
+def verify_spb(user_id: str, verification_code: str) -> flask.Response:
+    the_user = user.EmailUser.objects(id=me.ObjectId(user_id)).first()
     if the_user is None:
         return 'Invalid user ID', 404
 
-    the_user.activate_email(data['code'])
+    the_user.activate_email(verification_code)
     the_user.save()
 
     return f'Email {user.email} successfully verified'
