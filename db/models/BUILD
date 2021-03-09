@@ -35,7 +35,10 @@ py_library(
         ":player",
         "//auth:security",
         "//auth:jwt_context",
+        "//util:error",
         requirement("blinker"),
+        requirement("grpcio"),
+        requirement("jwt"),
         requirement("mongoengine"),
     ],
 )

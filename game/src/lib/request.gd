@@ -1,12 +1,13 @@
 extends Node
 # Easy interface for submitting HTTP requests.
 
-func request(uri: String, method: int, body: Dictionary) -> StatusOr:
+func request(
+		uri: String, headers: Array, method: int, body: Dictionary) -> StatusOr:
 	var http: HTTPRequest = HTTPRequest.new()
 	add_child(http)
 	var error = http.request(
 		uri,
-		["User-Agent: Godot", "Content-Type: application/json"],
+		["User-Agent: Godot", "Content-Type: application/json"] + headers,
 		true,
 		method, JSON.print(body))
 	var response: Array = yield(http, "request_completed")

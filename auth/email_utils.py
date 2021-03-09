@@ -12,9 +12,9 @@ _VERIFICATION_EMAIL_TEMPLATE = """
 Welcome to SPB! Please follow this link to verify your account:
 <br/>
 <a href="{verification_link}">{verification_link}</a>
-<br/>
-
+<br/><br/>
 Thanks,
+<br/>
 The Pirate King
 """.strip()
 

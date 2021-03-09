@@ -15,7 +15,7 @@ _JWT_PASSWORD_ENV = 'JWT_PASSWORD'
 _JWT_PRIVATE_KEY_ENV = 'JWT_PRIVATE_KEY'
 _JWT_PUBLIC_KEY_ENV = 'JWT_PUBLIC_KEY'
 
-_TIME_FIELDS = ['exp', 'issued']
+_TIME_FIELDS = ['exp', 'iat']
 
 
 @functools.lru_cache()
@@ -42,7 +42,7 @@ def encode(content: dict, expire_in: Optional[timedelta] = None) -> str:
     if expire_in is not None:
         exp = now + expire_in
         content['exp'] = jwt.utils.get_int_from_datetime(exp)
-    content['issued'] = jwt.utils.get_int_from_datetime(now)
+    content['iat'] = jwt.utils.get_int_from_datetime(now)
     return _jwt_instance().encode(content, _signing_key(), alg=_ALG)
 
 
@@ -51,5 +51,5 @@ def decode(encoded: str) -> dict:
         encoded, _verifying_key(), do_time_check=True)
     for field in _TIME_FIELDS:
         if field in result:
-            result[field] = jwt.utils.get_time_from_int(result[field])
+            result[field] = datetime.fromtimestamp(result[field])
     return result

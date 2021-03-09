@@ -2,9 +2,8 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("@py_deps//:requirements.bzl", "requirement")
 
 py_library(
-    name = "email",
-    srcs = ["email.py"],
-    visibility = ["//visibility:public"],
+    name = "email_utils",
+    srcs = ["email_utils.py"],
     deps = [
         "//lib:email_utils",
     ],
@@ -32,13 +31,15 @@ py_binary(
     name = "server",
     srcs = ["server.py"],
     deps = [
-        ":email",
+        ":email_utils",
         "//db:connect",
         "//db/models:news",
         "//db/models:user",
+        "//lib:flask_utils",
         "//util:error",
         requirement("absl-py"),
         requirement("Flask"),
         requirement("grpcio"),
+        requirement("mongoengine"),
     ],
 )

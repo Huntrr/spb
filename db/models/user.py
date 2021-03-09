@@ -3,12 +3,17 @@ Basic data model for a user.
 """
 from datetime import datetime, timedelta
 
+import bson
+import grpc
+import jwt
 import mongoengine as me
 
 from auth import jwt_context, security
 from db.models import player
+from util import error
 
 _JWT_EXPIRE_TIME = timedelta(days=7)
+_LEEWAY = timedelta(seconds=1)
 
 
 class User(me.Document):
@@ -30,11 +35,20 @@ class User(me.Document):
         document.last_active = datetime.utcnow()
 
     @classmethod
-    def from_jwt(cls, jwt):
-        user = jwt_context.decode(jwt)
-        if user['issued'] < self.last_login:
-            raise ValueError('JWT has been expired.')
-        return cls.objects(id=me.ObjectId(user['id'])).first()
+    def from_jwt(cls, token):
+        try:
+            user = jwt_context.decode(token)
+        except jwt.exceptions.JWTException:
+            raise error.SpbError('Invalid auth token', 408,
+                                 grpc.StatusCode.UNAUTHENTICATED)
+
+        object_id = bson.objectid.ObjectId(user['id'])
+        the_user = cls.objects(id=object_id).first()
+
+        if user['iat'] < the_user.last_login.replace(tzinfo=None) - _LEEWAY:
+            raise error.SpbError('JWT has been expired', 408,
+                                 grpc.StatusCode.UNAUTHENTICATED)
+        return the_user
 
 # Hook up the pre_save signal.
 me.signals.pre_save.connect(User.pre_save, sender=User)
@@ -42,35 +56,42 @@ me.signals.pre_save.connect(User.pre_save, sender=User)
 
 class GuestUser(User):
     """Special user subtype for guest accounts."""
-    guest_id = me.SequenceField(required=True, unique=True)
+    guest_id = me.SequenceField(required=True, unique=True, sparse=True)
 
     # Guest names do not have to be unique.
-    name = me.StringField(
+    guest_name = me.StringField(
         min_length=1, max_length=20, required=True,
         regex='[A-z\d_]+')
+
+    def get_name(self) -> str:
+        return self.guest_name
 
     def get_jwt(self) -> str:
         """Returns a JWT authenticating as this user."""
         self.last_login = datetime.utcnow()
         self.save()
 
-        user = dict(id=str(self.id), guest_id=self.guest_id, name=self.name)
+        user = dict(
+            id=str(self.id), guest_id=self.guest_id, name=self.get_name())
         return jwt_context.encode(user, _JWT_EXPIRE_TIME)
 
 
 class NonGuestUser(User):
     """Base for all permanent non-guest users."""
-    user_id = me.SequenceField(required=True, unique=True)
+    user_id = me.SequenceField(required=True, unique=True, sparse=True)
 
-    name = me.StringField(
+    user_name = me.StringField(
         min_length=1, max_length=20,
         required=True, unique=True,
-        regex='[A-z\d_]+')
+        sparse=True, regex=r'^[A-z\d_]+$')
+
+    def get_name(self) -> str:
+        return self.user_name
 
 
 class EmailUser(NonGuestUser):
     """A basic email/password-identified user."""
-    email = me.EmailField(required=True, unique=True)
+    email = me.EmailField(required=True, unique=True, sparse=True)
     email_verification_code = me.StringField(max_length=256)
     email_date_verified = me.DateTimeField()
 
@@ -87,13 +108,21 @@ class EmailUser(NonGuestUser):
     def set_password(self, password: str) -> None:
         """Salts, hashes, and sets a new password for this user."""
         if len(password) < 8:
-            raise ValueError('Password must be at least 8 characters')
+            raise error.SpbError(
+                'Password must be at least 8 characters',
+                400, grpc.StatusCode.INVALID_ARGUMENT)
+
+        if password == 'password':
+            raise error.SpbError(
+                'Password cannot be password',
+                400, grpc.StatusCode.INVALID_ARGUMENT)
+
         self.password_hash = security.pwd_context.hash(password)
 
     def activate_email(self, verification_code: str) -> None:
         """Activates this user's email if the |verification| code is correct."""
         if self.email_date_verified is not None:
-            raise ValueError(f'Email {self.email} already verified.')
+            raise ValueError(f'Account already verified.')
 
         if verification_code != self.email_verification_code:
             raise ValueError('Invalid verification code.')
@@ -104,10 +133,14 @@ class EmailUser(NonGuestUser):
     def get_jwt(self, password: str) -> str:
         """Returns a JWT authenticating as this user."""
         if not self.password_matches(password):
-            raise ValueError('Incorrect password.')
+            raise error.SpbError('Invalid email/password',
+                                 http_code=401,
+                                 spb_code=grpc.StatusCode.PERMISSION_DENIED)
 
         if self.email_date_verified is None:
-            raise ValueError('User is not verified.')
+            raise error.SpbError('Email is not verified',
+                                 http_code=403,
+                                 spb_code=grpc.StatusCode.FAILED_PRECONDITION)
 
         self.last_login = datetime.utcnow()
         self.save()
@@ -116,5 +149,5 @@ class EmailUser(NonGuestUser):
             id=str(self.id),
             user_id=self.user_id,
             email=self.email,
-            name=self.name)
+            name=self.get_name())
         return jwt_context.encode(user, _JWT_EXPIRE_TIME)

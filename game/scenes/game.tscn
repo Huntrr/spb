@@ -5,10 +5,14 @@ script/source = "extends Label
 
 
 func _ready():
-	if Connection.session_user.empty():
-		set_text(\"Not logged in\")
-	else:
-		set_text(Connection.session_user.name)
+	var data_status: StatusOr = yield(Connection.request(
+		\"auth\", \"identity\", HTTPClient.METHOD_GET, {}), \"completed\")
+	if not data_status.ok():
+		push_error(data_status.status.message)
+		return
+	
+	var data: Dictionary = data_status.value
+	set_text(\"Logged in as: %s\" % data.name)
 "
 
 [node name="Node" type="Node"]
@@ -23,7 +27,7 @@ __meta__ = {
 [node name="Label" type="Label" parent="Control"]
 margin_right = 40.0
 margin_bottom = 14.0
-text = "username"
+text = "Unauthenticated"
 script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false

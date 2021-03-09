@@ -34,12 +34,12 @@ func logged_in() -> bool:
 	return not session_user.empty()
 
 
-func log_out(status: Status = Status.new()) -> void:
+func log_out(status: Status = Status.new()) -> Status:
 	clear_session()
 	SceneManager.goto("res://scenes/menu/login.tscn")
-	call_deferred("_log_out_deferred")
 	if not status.ok():
 		Dialog.show_error(status)
+	return status
 
 
 func clear_session() -> void:
@@ -73,8 +73,11 @@ func set_session(jwt: String) -> Status:
 func request(
 		service: String, uri: String, method: int, body: Dictionary) -> StatusOr:
 	var full_uri: String = "%s/%s" % [addresses()[service], uri]
+	var headers: Array = []
+	if logged_in():
+		headers.append("Authorization: JWT %s" % _session_jwt)
 	var response_status: StatusOr = yield(
-		Request.request(full_uri, method, body), "completed")
+		Request.request(full_uri, headers, method, body), "completed")
 	if not response_status.ok():
 		return response_status
 	
@@ -89,7 +92,12 @@ func request(
 		
 		var code: int = Status.from_http_code(response.code)
 		if "spb_code" in response.data:
-			code = response.data.code
+			code = response.data.spb_code
+		
+		if code == Status.UNAUTHENTICATED:
+			# Log out if the current token is bad.
+			return StatusOr.new().from_status(
+				log_out(Status.new(code, message)))
 		
 		return StatusOr.new().from_status(
 			Status.new(code, message))
