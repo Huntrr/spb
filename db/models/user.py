@@ -45,6 +45,9 @@ class User(me.Document):
         object_id = bson.objectid.ObjectId(user['id'])
         the_user = cls.objects(id=object_id).first()
 
+        if the_user is None:
+            raise error.SpbError('That user no longer exists', 400,
+                                 grpc.StatusCode.UNAUTHENTICATED)
         if user['iat'] < the_user.last_login.replace(tzinfo=None) - _LEEWAY:
             raise error.SpbError('JWT has been expired', 408,
                                  grpc.StatusCode.UNAUTHENTICATED)
