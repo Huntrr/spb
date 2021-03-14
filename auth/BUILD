@@ -35,6 +35,7 @@ py_binary(
         "//db:connect",
         "//db/models:news",
         "//db/models:user",
+        "//db/models:server_auth",
         "//lib:flask_utils",
         "//util:error",
         requirement("absl-py"),

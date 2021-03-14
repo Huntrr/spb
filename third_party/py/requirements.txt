@@ -6,6 +6,10 @@ blinker==1.4
 # Usage: Mongoengine hooks.
 # License: MIT
 
+click==7.1.2
+# Usage: CLIs.
+# Lience: BSD 3-Clause
+
 dnspython==2.1.0
 # Usage: Connecting to MongoDB.
 # License: ISC

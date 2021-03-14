@@ -130,6 +130,18 @@ func login_user(email: String, password: String) -> Status:
 	return set_session(data.jwt)
 
 
+func login_server(auth_key: String) -> Status:
+	var data_status: StatusOr = yield(request(
+		"auth", "login/server", HTTPClient.METHOD_POST, {
+			"auth_key": auth_key,
+		}), "completed")
+	if not data_status.ok():
+		return data_status.status
+	var data: Dictionary = data_status.value
+	
+	return set_session(data.jwt)
+
+
 func register_user(email: String, name: String, password: String) -> Status:
 	var data_status: StatusOr = yield(request(
 		"auth", "register/spb", HTTPClient.METHOD_POST, {

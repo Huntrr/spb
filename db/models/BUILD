@@ -42,3 +42,17 @@ py_library(
         requirement("mongoengine"),
     ],
 )
+
+py_library(
+    name = "server_auth",
+    srcs = ["server_auth.py"],
+    deps = [
+        ":player",
+        "//auth:security",
+        "//auth:jwt_context",
+        "//util:error",
+        requirement("grpcio"),
+        requirement("jwt"),
+        requirement("mongoengine"),
+    ],
+)

@@ -12,7 +12,7 @@ import mongoengine as me
 
 from auth import email_utils
 from db import connect
-from db.models import news, user
+from db.models import news, user, server_auth
 from lib import flask_utils
 from util import error
 
@@ -37,10 +37,23 @@ def get_news() -> flask.Response:
 
 
 @app.route('/identity', methods=['GET'])
-@flask_utils.login_required
-def identity(the_user) -> flask.Response:
+@flask_utils.user_required
+def identity(the_user: user.User) -> flask.Response:
     """Returns the name of the currently authenticated user."""
     return dict(name=the_user.get_name())
+
+
+@app.route('/identity_server', methods=['GET'])
+@flask_utils.server_required
+def identity_server(server_auth: server_auth.ServerAuth) -> flask.Response:
+    """Returns 200 if the server is authenticated."""
+    return dict(id=str(server_auth.id))
+
+
+@app.route('/login/server', methods=['POST'])
+def login_server() -> flask.Response:
+    data = flask.request.json
+    return dict(jwt=server_auth.ServerAuth.get_jwt(data['auth_key']))
 
 
 @app.route('/login/guest', methods=['POST'])

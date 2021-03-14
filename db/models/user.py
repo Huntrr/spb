@@ -75,7 +75,11 @@ class GuestUser(User):
         self.save()
 
         user = dict(
-            id=str(self.id), guest_id=self.guest_id, name=self.get_name())
+            type='player',
+            id=str(self.id),
+            guest_id=self.guest_id,
+            name=self.get_name(),
+        )
         return jwt_context.encode(user, _JWT_EXPIRE_TIME)
 
 
@@ -149,6 +153,7 @@ class EmailUser(NonGuestUser):
         self.save()
 
         user = dict(
+            type='player',
             id=str(self.id),
             user_id=self.user_id,
             email=self.email,
