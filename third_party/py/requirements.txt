@@ -18,6 +18,18 @@ Flask==1.1.2
 # Usage: Web server.
 # License: BSD 3-Clause
 
+Flask-Sockets==0.2.1
+# Usage: Websockets.
+# License: MIT
+
+gevent==21.1.2
+# Usage: Flask/socket server.
+# License: MIT
+
+gevent-websocket==0.10.1
+# Usage: Socket server.
+# License: Apache 2.0
+
 grpcio==1.36.0
 # Usage: Error codes.
 # License: Apache 2.0
@@ -33,6 +45,10 @@ mongoengine==0.22.1
 passlib==1.7.4
 # Usage: Password hashing.
 # License: BSD
+
+redis==3.5.3
+# Usage: Redis.
+# License: MIT
 
 sendgrid==6.6.0
 # Usage: Send user verification emails.

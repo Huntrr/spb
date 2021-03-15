@@ -10,6 +10,7 @@ class Ship(me.Document):
 
     blueprint = me.ListField(me.DictField())
 
+
 class VirtualShip(Ship):
     """A ship that exists only in a given simulator battle."""
 
@@ -21,3 +22,18 @@ class OverworldShip(Ship):
         regex='[A-z\d_]+')
 
     owner = me.ReferenceField('User')
+
+class SpaceStation(OverworldShip):
+    spawnable = me.BooleanField()
+
+    @classmethod
+    def get_random_player_spawn(cls) -> 'SpaceStation':
+        """Get a random player spawn station."""
+        pipeline = [
+            {'$match' : {'spawnable': True}},
+            {'$sample': {'size': 1}},
+            {'$project': {'_id': 1}},
+        ]
+        spawn = next(iter(cls.objects().aggregate(pipeline)), None)
+        assert spawn is not None
+        return spawn['_id']

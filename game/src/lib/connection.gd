@@ -1,12 +1,15 @@
 extends Node
 # Holds server address constants for various client requests.
 
+onready var Log := Logger.new(self)
+
 var environment = "PROD"
 onready var Request = get_node("/root/Request")
 
 const dict = {
 	"PROD": {
-		"auth": "http://0.0.0.0:30202"
+		"auth": "http://0.0.0.0:30202",
+		"gateway": "http://0.0.0.0:30201"
 	}
 }
 const SESSION_PATH = "user://session.dat"
@@ -62,12 +65,30 @@ func set_session(jwt: String) -> Status:
 	
 	session_user = json_user.result
 	
-	var file = File.new()
-	file.open(SESSION_PATH, File.WRITE)
-	file.store_string(jwt)
-	file.close()
+	if session_user.type == "player":
+		var file = File.new()
+		file.open(SESSION_PATH, File.WRITE)
+		file.store_string(jwt)
+		file.close()
 
 	return Status.new()
+
+
+func ws_connect(service: String, uri: String) -> StatusOr:
+	var full_uri: String = "%s/%s" % [addresses()[service], uri]
+	full_uri = full_uri.replace("http://", "ws://").replace("https://", "ws://")
+	Log.info(full_uri)
+	var client = WebSocketClient.new()
+	var headers = PoolStringArray()
+	if logged_in():
+		headers.append("Authorization: JWT %s" % _session_jwt)
+	
+	var err = client.connect_to_url(full_uri, PoolStringArray(), false, headers)
+	if err != OK:
+		return StatusOr.new().from_status(Status.new(
+			Status.UNKNOWN, "Error establishing WebSocket connection"))
+	
+	return StatusOr.new().from_value(client)
 
 
 func request(

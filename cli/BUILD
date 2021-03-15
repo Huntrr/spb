@@ -10,3 +10,13 @@ py_binary(
         requirement("click"),
     ],
 )
+
+py_binary(
+    name = "ship_cli",
+    srcs = ["ship_cli.py"],
+    deps = [
+         "//db:connect",
+         "//db/models:ship",
+        requirement("click"),
+    ],
+)

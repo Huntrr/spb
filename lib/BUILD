@@ -22,3 +22,12 @@ py_library(
         requirement("grpcio"),
     ],
 )
+
+py_library(
+    name = "redis_client",
+    srcs = ["redis_client.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("redis"),
+    ],
+)

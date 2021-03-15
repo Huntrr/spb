@@ -6,16 +6,9 @@ onready var _splash: Node = $Splash
 
 func _ready():
 	var arguments := {}
-	for argument in OS.get_cmdline_args():
-		if argument.find("=") > -1:
-			var key_value = argument.split("=")
-			arguments[key_value[0].lstrip("--")] = key_value[1]
-		else:
-			arguments[argument.lstrip("--")] = true
-
-	if arguments.has("server") or OS.has_feature("Server"):
+	if "--server" in OS.get_cmdline_args() or OS.has_feature("Server"):
 		Log.info("Starting SPB server")
-		var auth_key: String = arguments["auth_key"]
+		var auth_key: String = OS.get_environment("SPB_AUTH_KEY")
 		var status: Status = yield(Connection.login_server(auth_key), "completed")
 		if not status.ok():
 			Log.error("Error %d: %s" % [status.code, status.message])
