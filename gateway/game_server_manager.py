@@ -180,9 +180,9 @@ class GameServerManager:
         {
             timestamp: float,
             total_pop: int,
-            ships: {
-                <ship_id>: {
-                    room_id: str,
+            ship_rooms: {
+                <room_id>: {
+                    ship_id: str,
                     pop: int,
                 },
             },
