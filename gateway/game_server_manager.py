@@ -69,6 +69,7 @@ class GameServerManager:
         """Returns a (server IP, room ID) pair that can host players on a given
         ship."""
         ship_id = str(the_ship.id)
+        logging.info('Looking for room for ship_id=%s', ship_id)
 
         started = datetime.now()
         while datetime.now() - started < _SEARCH_TIMEOUT:
@@ -85,14 +86,21 @@ class GameServerManager:
                         if not status or (now - status['timestamp'] >
                                           _POLL_INTERVAL * _ALLOWED_MISSES):
                             # Server hasn't been healthy in too long.
+                            glog.warning(
+                                'Ship server %s hasn\'t reported in too long',
+                                server_ip)
                             self._r.hdel(_SHIP_KEY, ship_id)
                         elif room_id not in status['ship_rooms']:
                             # This server no longer has this room.
+                            glog.warning(
+                                'Room %s on ship server %s is missing',
+                                server_ip)
                             self._r.hdel(_SHIP_KEY, ship_id)
                         else:
                             return server_ip, room_id
 
                     # Failed to find a usable server, request to create one.
+                    glog.info('Couldn\'t find room for ship_id %s', ship_id)
                     self._r.publish(_PUBSUB_TOPIC, f'CREATE_SHIP,{ship_id}')
             except LockError:
                 raise error.SpbError(
