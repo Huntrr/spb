@@ -45,8 +45,8 @@ def join_ship(the_user: user.User) -> flask.Response:
     """
     the_ship = user.player.location_ship
     server_ip, room_id = (
-        _game_server_manager().get_or_make_game_server(the_ship))
-    return dict(server_ip=server_ip, ship_id=room_id)
+        _game_server_manager().get_or_make_ship_server(the_ship))
+    return dict(server_ip=server_ip, room_id=room_id)
 
 
 def main(_) -> None:

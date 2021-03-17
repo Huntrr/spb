@@ -18,16 +18,17 @@ from gateway import ws_manager
 from lib import redis_client
 from util import error
 
-_POLL_INTERVAL = 5
-_ALLOWED_MISSES = 3
-_POLL_TIMEOUT = 5
+_POLL_INTERVAL = 1  # How often we poll the servers.
+_ALLOWED_MISSES = 3  # How many misses are allowed before a server is ignored.
+_POLL_TIMEOUT = 5  # How long we wait for a response to the poll request.
 
-_LOCK_TIMEOUT = 60
-_WAIT_INTERVAL = 0.2
-_SEARCH_TIMEOUT = timedelta(minutes=1)
+_LOCK_TIMEOUT = 60  # How long Redis room status locks last.
+_WAIT_INTERVAL = 0.2  # Interval we poll at to see if the room was created.
+_SEARCH_TIMEOUT = timedelta(minutes=1)  # How long we spend waiting for a room.
 
-_MAX_EXECUTORS = 20
+_MAX_EXECUTORS = 20  # Max concurrency of the request workers.
 
+# Arbitrary Redis labels.
 _REDIS_PREFIX = 'GS'
 _LOCK_PREFIX = f'{_REDIS_PREFIX}_LOCK'
 
@@ -64,7 +65,7 @@ class GameServerManager:
             self._server_managers[server_ip] = manager
             self._set_status(server_ip, status)
 
-    def get_or_make_game_server(self, the_ship: ship.Ship) -> Tuple[str, str]:
+    def get_or_make_ship_server(self, the_ship: ship.Ship) -> Tuple[str, str]:
         """Returns a (server IP, room ID) pair that can host players on a given
         ship."""
         ship_id = str(the_ship.id)
@@ -84,6 +85,9 @@ class GameServerManager:
                         if not status or (now - status['timestamp'] >
                                           _POLL_INTERVAL * _ALLOWED_MISSES):
                             # Server hasn't been healthy in too long.
+                            self._r.hdel(_SHIP_KEY, ship_id)
+                        elif room_id not in status['ship_rooms']:
+                            # This server no longer has this room.
                             self._r.hdel(_SHIP_KEY, ship_id)
                         else:
                             return server_ip, room_id
@@ -133,7 +137,7 @@ class GameServerManager:
 
 
     def _handle_request(self, message) -> None:
-        if message['type'] == message:
+        if message['type'] == 'message':
             [command, data] = message['data'].split(',')
             if command == 'CREATE_SHIP':
                 self._request_executor.submit(self._create_ship_room, data)

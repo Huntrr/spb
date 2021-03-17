@@ -45,8 +45,8 @@ class WSManager:
                     self._req_res[req_id] = data
                     self._req_cvs[req_id].notify_all()
         finally:
-            self._free_all_reqs()
             self._alive = False
+            self._free_all_reqs()
 
     def send(self, data: dict,
              timeout: Optional[float] = None) -> Optional[dict]:
@@ -68,6 +68,8 @@ class WSManager:
 
         if not not_timeout:
             logging.warning('Request timeout req_id=%s', req_id)
+            del self._req_cvs[req_id]
+            return None
         res = self._req_res.get(req_id)
         del self._req_cvs[req_id]
         del self._req_res[req_id]
