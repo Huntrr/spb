@@ -1,6 +1,8 @@
 extends Node
 # Holds server address constants for various client requests.
 
+const SHIP_PORT: int = 31201
+
 onready var Log := Logger.new(self)
 
 var environment = "PROD"

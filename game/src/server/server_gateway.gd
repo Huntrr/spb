@@ -7,6 +7,19 @@ var _try_connect = true
 var _last_try = 0
 const TRY_INTERVAL = 5
 
+onready var _ship_rooms: ShipRooms = $ShipRooms
+
+
+func _ready() -> void:
+	var data_status: StatusOr = yield(Connection.request(
+		"auth", "identity_server", HTTPClient.METHOD_GET, {}), "completed")
+	if not data_status.ok():
+		push_error(data_status.status.message)
+		return
+	
+	var data: Dictionary = data_status.value
+	Log.info("Server identified as: %s" % data.id)
+
 
 func _send(message: Dictionary) -> void:
 	_client.get_peer(1).put_packet(JSON.print(message).to_utf8())
@@ -32,7 +45,30 @@ func _on_data():
 	var data: Dictionary = data_json.result
 	
 	if data.type == "PING":
-		_send({"type": "PONG"})
+		Log.info("Ping!")
+		_send({
+			"type": "PONG",
+			"req_id": data.req_id,
+			"timestamp": OS.get_system_time_secs,
+			"total_pop": _ship_rooms.get_pop(),
+			"ship_rooms": _ship_rooms.get_status(),
+		})
+		return
+	
+	if data.type == "CREATE_SHIP":
+		Log.info("Received request to create room for ship %s" % data.ship_id)
+		var room_id_status: StatusOr = _ship_rooms.create_ship(data.ship_id)
+		if not room_id_status.ok():
+			Log.error("Failed to create room: " % room_id_status.status.message)
+		else:
+			Log.info("Created ship, with room_id=%s" % room_id_status.value)
+		_send({
+			"type": "CREATED_SHIP",
+			"req_id": data.req_id,
+			"timestamp": OS.get_system_time_secs(),
+			"successful": room_id_status.ok(),
+			"room_id": room_id_status.value if room_id_status.ok() else "",
+		})
 		return
 		
 	Log.error("Unknown WS message data:\n%s" % JSON.print(data))

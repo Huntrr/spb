@@ -20,6 +20,11 @@ _global_script_classes=[ {
 "path": "res://src/resources/tiles/blueprint_placement.gd"
 }, {
 "base": "Node",
+"class": "Inside",
+"language": "GDScript",
+"path": "res://src/game/world/inside/inside.gd"
+}, {
+"base": "Node",
 "class": "Logger",
 "language": "GDScript",
 "path": "res://src/utils/logger.gd"
@@ -48,6 +53,11 @@ _global_script_classes=[ {
 "class": "ShipPlacement",
 "language": "GDScript",
 "path": "res://src/resources/tiles/ship_placement.gd"
+}, {
+"base": "Node",
+"class": "ShipRooms",
+"language": "GDScript",
+"path": "res://src/server/ship_rooms.gd"
 }, {
 "base": "Resource",
 "class": "SpaceshipBlueprint",
@@ -79,6 +89,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/resources/tiles/tile_registry.gd"
 }, {
+"base": "Node",
+"class": "Uuid",
+"language": "GDScript",
+"path": "res://src/third_party/uuid/uuid.gd"
+}, {
 "base": "Resource",
 "class": "VersionInfo",
 "language": "GDScript",
@@ -87,18 +102,21 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "Base64Url": "",
 "BlueprintPlacement": "",
+"Inside": "",
 "Logger": "",
 "ObjectTile": "",
 "Response": "",
 "Rotation": "",
 "Ship": "",
 "ShipPlacement": "",
+"ShipRooms": "",
 "SpaceshipBlueprint": "",
 "Status": "",
 "StatusOr": "",
 "SubtitleOptions": "",
 "Tile": "",
 "TileRegistry": "",
+"Uuid": "",
 "VersionInfo": ""
 }
 

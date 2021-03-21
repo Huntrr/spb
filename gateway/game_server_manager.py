@@ -122,26 +122,26 @@ class GameServerManager:
     def _create_ship_room(self, ship_id: str) -> None:
         """Works with the connected gameservers to create a room for |ship_id|.
         """
-            ordered_servers = [
-                server_ip for server_ip, _ in
-                sorted(self._server_statuses.items(), key=self._server_sort_key)
-            ]
-            for server_ip in ordered_servers:
-                with self._lock(ship_id):
-                    if self._r.hexists(_SHIP_KEY, ship_id):
-                        # Someone beat us to it! The room already exists.
+        ordered_servers = [
+            server_ip for server_ip, _ in
+            sorted(self._server_statuses.items(), key=self._server_sort_key)
+        ]
+        for server_ip in ordered_servers:
+            with self._lock(ship_id):
+                if self._r.hexists(_SHIP_KEY, ship_id):
+                    # Someone beat us to it! The room already exists.
+                    return
+                with self._poll_lock:
+                    manager = self._server_managers[server_ip]
+                    self._server_accesses[server_ip] = time.time()
+                    response = manager.send({
+                        'type': 'CREATE_SHIP',
+                        'ship_id': ship_id,
+                    })
+                    if response and response['successful']:
+                        value = f'{server_ip},{response["room_id"]}'
+                        self._hset(_SHIP_KEY, ship_id, value)
                         return
-                    with self._poll_lock:
-                        manager = self._server_managers[server_ip]
-                        self._server_accesses[server_ip] = time.time()
-                        response = manager.send({
-                            'type': 'CREATE_SHIP',
-                            'ship_id': 'ship_id',
-                        })
-                        if response and response['successful']:
-                            value = f'{server_ip},{response['room_id']}'
-                            self._hset(_SHIP_KEY, ship_id, value)
-                            return
 
 
     def _handle_request(self, message) -> None:
@@ -183,6 +183,7 @@ class GameServerManager:
             f'{_LOCK_PREFIX}_{location_id}', timeout=_LOCK_TIMEOUT)
 
     def _set_status(self, server_ip: str, status: dict) -> None:
+        status['last_healthy'] = datetime.now().timestamp()
         self._r.hset(_STATUS_KEY, server_ip, status)
         self._server_statuses[server_ip] = status
 
