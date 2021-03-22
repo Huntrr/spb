@@ -22,6 +22,7 @@ py_binary(
         ":ws_manager",
         "//db:connect",
         "//db/models:server_auth",
+        "//db/models:user",
         "//lib:flask_utils",
         requirement("absl-py"),
         requirement("Flask"),

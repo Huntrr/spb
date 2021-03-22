@@ -5,13 +5,14 @@ const SHIP_PORT: int = 31201
 
 onready var Log := Logger.new(self)
 
-var environment = "PROD"
+var environment = "DEV"
 onready var Request = get_node("/root/Request")
 
 const dict = {
-	"PROD": {
+	"DEV": {
 		"auth": "http://0.0.0.0:30202",
-		"gateway": "http://0.0.0.0:30201"
+		"gateway": "http://0.0.0.0:30201",
+		"universe": "http://0.0.0.0:30200",
 	}
 }
 const SESSION_PATH = "user://session.dat"

@@ -53,11 +53,15 @@ def main(_) -> None:
     from gevent import pywsgi
     from geventwebsocket.handler import WebSocketHandler
 
+    logging.info('Registering special routes')
+    app.register_error_handler(error.SpbError, flask_utils.error_handler)
+
     logging.info('Connecting to database')
     connect.connect()
 
     logging.info(f'Launching gateway server on :{FLAGS.port}')
-    server = pywsgi.WSGIServer(('', FLAGS.port), app, handler_class=WebSocketHandler)
+    server = pywsgi.WSGIServer(
+        ('', FLAGS.port), app, handler_class=WebSocketHandler)
     server.serve_forever()
 
 
