@@ -62,3 +62,15 @@ func _customize_children():
 		frontier += node.get_children()
 		# Same as in _on_add_node we customize the MultiplayerAPI of our child.
 		node.custom_multiplayer = custom_multiplayer
+
+master func request_join_room(room_id: String) -> void:
+	for child in get_children():
+		if child.name == room_id:
+			return
+	
+	multiplayer.get_rpc_sender_id()
+	rpc_id(multiplayer.get_rpc_sender_id(), "kick")
+
+puppet func kick() -> void:
+	push_error("Got kicked!")
+	custom_multiplayer.network_peer = null

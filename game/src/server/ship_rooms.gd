@@ -2,16 +2,26 @@ class_name ShipRooms
 extends Node
 # Main game server interface for managing ship rooms.
 
+onready var Log := Logger.new(self)
+
 const MAX_PLAYERS: int = 500
 
 const InsideScene: PackedScene = preload("res://scenes/world/inside/inside.tscn")
 onready var _wrapper: Node = $MultiplayerWrapper
+
+var peers: Dictionary = {}
 
 func _ready() -> void:
 	# Initialize the multiplayer server.
 	var peer = NetworkedMultiplayerENet.new()
 	peer.create_server(Connection.SHIP_PORT, MAX_PLAYERS)
 	_wrapper.multiplayer.network_peer = peer
+	
+		
+	_wrapper.multiplayer.connect(
+		"network_peer_disconnected", self, "_on_peer_disconnected")
+	_wrapper.multiplayer.connect(
+		"network_peer_connected", self, "_on_peer_connected")
 
 func get_status() -> Dictionary:
 	var status: Dictionary = {}
@@ -32,3 +42,13 @@ func create_ship(ship_id: String) -> StatusOr:
 	var ship: Inside = InsideScene.instance().init(ship_id, room_id)
 	_wrapper.add_child(ship)
 	return StatusOr.new().from_value(room_id)
+
+
+func _on_peer_connected(id: int) -> void:
+	Log.info("Got new peer connection, id=%d" % id)
+	peers[id] = true
+
+
+func _on_peer_disconnected(id: int) -> void:
+	Log.info("Got peer disconnected, id=%d" % id)
+	peers.erase(id)
