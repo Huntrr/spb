@@ -3,6 +3,7 @@ bin/
 *.DS_STORE
 # Ignore Vim swap files.
 .*.swp
+dump.rdb
 
 # Godot-specific ignores
 .import/

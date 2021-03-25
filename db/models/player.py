@@ -13,7 +13,7 @@ class Location(me.EmbeddedDocument):
         default=_ship.SpaceStation.get_random_player_spawn)
 
     def to_dict(self) -> dict:
-        return dict(ship_id=str(ship.id))
+        return dict(ship_id=str(self.ship.id))
 
 
 class Player(me.EmbeddedDocument):
@@ -21,4 +21,4 @@ class Player(me.EmbeddedDocument):
     location = me.EmbeddedDocumentField(Location, default=Location)
 
     def to_dict(self) -> dict:
-        return dict(location=location.to_dict())
+        return dict(location=self.location.to_dict())

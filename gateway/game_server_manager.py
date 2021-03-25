@@ -88,23 +88,25 @@ class GameServerManager:
                         if not status or (now - status['timestamp'] >
                                           _POLL_INTERVAL * _ALLOWED_MISSES):
                             # Server hasn't been healthy in too long.
-                            glog.warning(
+                            logging.warning(
                                 'Ship server %s hasn\'t reported in too long',
                                 server_ip)
                             self._r.hdel(_SHIP_KEY, ship_id)
                         elif room_id not in status['ship_rooms']:
                             # This server no longer has this room.
-                            glog.warning(
+                            logging.warning(
                                 'Room %s on ship server %s is missing',
                                 server_ip)
                             self._r.hdel(_SHIP_KEY, ship_id)
                         else:
+                            logging.info('Returning server %s for room %s',
+                                         server_ip, room_id)
                             return server_ip, room_id
 
                     # Failed to find a usable server, request to create one.
-                    glog.info('Couldn\'t find room for ship_id %s', ship_id)
+                    logging.info('Couldn\'t find room for ship_id %s', ship_id)
                     self._r.publish(_PUBSUB_TOPIC, f'CREATE_SHIP,{ship_id}')
-            except LockError:
+            except redis.exceptions.LockError:
                 raise error.SpbError(
                     'Error finding a game server', 500, grpc.StatusCode.UNKNOWN)
 
@@ -114,6 +116,8 @@ class GameServerManager:
             while datetime.now() - started < _SEARCH_TIMEOUT:
                 time.sleep(_WAIT_INTERVAL)
                 if self._r.hexists(_SHIP_KEY, ship_id):
+                    logging.info('Successfully created server for ship %s',
+                                 ship_id)
                     break
 
         raise error.SpbError(
@@ -176,7 +180,8 @@ class GameServerManager:
                     logging.info('Cleaning up dead game server %s', server_ip)
                     del self._server_managers[server_ip]
                     del self._server_statuses[server_ip]
-                    del self._server_accesses[server_ip]
+                    if server_ip in self._server_accesses:
+                        del self._server_accesses[server_ip]
 
             time.sleep(_POLL_INTERVAL)
 
@@ -186,7 +191,7 @@ class GameServerManager:
 
     def _set_status(self, server_ip: str, status: dict) -> None:
         status['last_healthy'] = datetime.now().timestamp()
-        self._r.hset(_STATUS_KEY, server_ip, status)
+        self._r.hset(_STATUS_KEY, server_ip, json.dumps(status))
         self._server_statuses[server_ip] = status
 
     def _poll(self, server_ip: str) -> Optional[dict]:

@@ -19,21 +19,30 @@ class WSManager:
         self._req_cvs = {}
         self._req_res = {}
 
+        self._alive_cv = threading.Condition()
         self._alive = True
+
+        self._run_thread = threading.Thread(target=self._run)
+        self._run_thread.start()
+
 
     def alive(self) -> bool:
         return self._alive
 
-    def run(self) -> None:
+    def wait(self) -> None:
+        """Block until the connection dies."""
+        with self._alive_cv:
+            self._alive_cv.wait_for(lambda: not self._alive)
+
+    def _run(self) -> None:
         """Runs the WSManager until the connection closes."""
         try:
             while not self._ws.closed:
-                logging.info('WAIT')
                 message = self._ws.receive()
-                logging.info('REC')
+                if message is None:
+                    continue
                 data = json.loads(message.decode())
-                logging.info(data)
-                req_id = data.get['req_id']
+                req_id = data.get('req_id')
                 if not req_id:
                     logging.error('Got invalid response: %s', message)
                     continue
@@ -42,7 +51,6 @@ class WSManager:
                     logging.error('Got unexpected response: %s', message)
                     continue
 
-                logging.info('Got WS response req_id=%s', req_id)
                 with self._req_cvs[req_id]:
                     data['timestamp'] = datetime.now().timestamp()
                     self._req_res[req_id] = data
@@ -50,6 +58,8 @@ class WSManager:
         finally:
             self._alive = False
             self._free_all_reqs()
+            with self._alive_cv:
+                self._alive_cv.notify_all()
 
     def send(self, data: dict,
              timeout: Optional[float] = None) -> Optional[dict]:
@@ -66,7 +76,6 @@ class WSManager:
         self._req_cvs[req_id] = cv
         with cv:
             self._ws.send(message)
-            logging.info('Send WS request req_id=%s', req_id)
             not_timeout = cv.wait(timeout=timeout)
 
         if not not_timeout:

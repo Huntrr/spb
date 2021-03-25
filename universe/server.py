@@ -24,8 +24,10 @@ app = flask.Flask(__name__)
 @flask_utils.server_required
 def get_ship(_) -> flask.Response:
     data = flask.request.json
-    object_id = bson.objectid.ObjectId(data['ship_id'])
-    the_ship = ship.objects(id=ship_id).first()
+    ship_id = data['ship_id']
+
+    object_id = bson.objectid.ObjectId(ship_id)
+    the_ship = ship.Ship.objects(id=object_id).first()
     if not the_ship:
         raise error.SpbError(f'ship {ship_id} not found',
                              404, grpc.StatusCode.NOT_FOUND)
@@ -36,8 +38,10 @@ def get_ship(_) -> flask.Response:
 @flask_utils.server_required
 def get_player(_) -> flask.Response:
     data = flask.request.json
-    object_id = bson.objectid.ObjectId(data['ship_id'])
-    the_user = user.objects(id=user_id).first()
+    user_id = data['user_id']
+
+    object_id = bson.objectid.ObjectId(user_id)
+    the_user = user.User.objects(id=object_id).first()
     if not the_user:
         raise error.SpbError(f'user {user_id} not found',
                              404, grpc.StatusCode.NOT_FOUND)

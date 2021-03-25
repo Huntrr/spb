@@ -1,6 +1,9 @@
 """
 Launcher for gateway server.
 """
+from gevent import monkey
+monkey.patch_all()
+
 import functools
 
 from absl import app as base_app
@@ -36,15 +39,15 @@ def connect_server(server_auth: server_auth.ServerAuth, ws) -> None:
     logging.info('Establishing game server connection with %s', server_ip)
 
     _game_server_manager().register_server(server_ip, manager)
-    manager.run()
+    manager.wait()
 
 
-@app.route('/join_ship', methods=['GET'])
+@app.route('/join_ship', methods=['POST'])
 @flask_utils.user_required
 def join_ship(the_user: user.User) -> flask.Response:
     """Returns a game server address & ship id that can be used to join a ship.
     """
-    the_ship = user.player.location_ship
+    the_ship = the_user.player.location.ship
     server_ip, room_id = (
         _game_server_manager().get_or_make_ship_server(the_ship))
     return dict(server_ip=server_ip, room_id=room_id, ship_id=str(the_ship.id))

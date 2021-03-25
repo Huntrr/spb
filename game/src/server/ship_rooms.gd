@@ -39,7 +39,7 @@ func get_pop() -> int:
 
 func create_ship(ship_id: String) -> StatusOr:
 	var room_id = Uuid.v4()
-	var ship: Inside = InsideScene.instance().init(ship_id, room_id, self)
+	var ship: Inside = InsideScene.instance().init(ship_id, room_id)
 	_wrapper.add_child(ship)
 	return StatusOr.new().from_value(room_id)
 

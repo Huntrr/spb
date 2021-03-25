@@ -11,7 +11,7 @@ class Ship(me.Document):
     blueprint = me.ListField(me.DictField())
 
     def to_dict(self) -> dict:
-        return dict(blueprint=blueprint)
+        return dict(blueprint=self.blueprint)
 
 
 class VirtualShip(Ship):
