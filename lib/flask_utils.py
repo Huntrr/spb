@@ -1,6 +1,7 @@
 """
 Useful helpers for Flask servers.
 """
+import functools
 from typing import Callable
 
 from absl import logging
@@ -35,6 +36,7 @@ def user_required(func) -> Callable:
     """Requires the request have a proper authorization token, and passes the
     decoded user to the endpoint.
     """
+    @functools.wraps(func)
     def inner_user_required(*args, **kwargs):
         the_user = user.User.from_jwt(_get_token_str())
         return func(the_user, *args, **kwargs)
@@ -45,6 +47,7 @@ def user_required(func) -> Callable:
 def server_required(func) -> Callable:
     """Requires the request have a proper authorization token for an SPB server.
     """
+    @functools.wraps(func)
     def inner_server_required(*args, **kwargs):
         the_server_auth = server_auth.ServerAuth.from_jwt(_get_token_str())
         return func(the_server_auth, *args, **kwargs)

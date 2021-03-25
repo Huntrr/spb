@@ -26,9 +26,8 @@ func _send(message: Dictionary) -> void:
 
 
 func _closed(was_clean: bool = false) -> void:
-	Log.error("Closed WS connection: %d" % was_clean)
+	Log.error("Closed WS connection: was_clean=%s" % was_clean)
 	_try_connect = true
-	_last_try = 0
 
 
 func _connected(proto: String = "") -> void:
@@ -49,7 +48,7 @@ func _on_data():
 		_send({
 			"type": "PONG",
 			"req_id": data.req_id,
-			"timestamp": OS.get_system_time_secs,
+			"timestamp": OS.get_system_time_secs(),
 			"total_pop": _ship_rooms.get_pop(),
 			"ship_rooms": _ship_rooms.get_status(),
 		})

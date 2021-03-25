@@ -12,6 +12,7 @@ from db import connect
 from db.models import server_auth, user
 from gateway import game_server_manager, ws_manager
 from lib import flask_utils
+from util import error
 
 flags.DEFINE_integer('port', 30201, 'Port to use for the gateway server.')
 

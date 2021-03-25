@@ -15,7 +15,7 @@ func _ready() -> void:
 	# Initialize the multiplayer server.
 	var peer = NetworkedMultiplayerENet.new()
 	peer.create_server(Connection.SHIP_PORT, MAX_PLAYERS)
-	_wrapper.multiplayer.network_peer = peer
+	_wrapper.multiplayer.set_network_peer(peer)
 	
 		
 	_wrapper.multiplayer.connect(

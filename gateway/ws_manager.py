@@ -28,8 +28,11 @@ class WSManager:
         """Runs the WSManager until the connection closes."""
         try:
             while not self._ws.closed:
+                logging.info('WAIT')
                 message = self._ws.receive()
+                logging.info('REC')
                 data = json.loads(message.decode())
+                logging.info(data)
                 req_id = data.get['req_id']
                 if not req_id:
                     logging.error('Got invalid response: %s', message)
@@ -62,7 +65,7 @@ class WSManager:
         cv = threading.Condition()
         self._req_cvs[req_id] = cv
         with cv:
-            ws.send(message)
+            self._ws.send(message)
             logging.info('Send WS request req_id=%s', req_id)
             not_timeout = cv.wait(timeout=timeout)
 

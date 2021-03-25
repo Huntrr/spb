@@ -54,6 +54,8 @@ class GameServerManager:
 
         self._request_executor = futures.ThreadPoolExecutor(_MAX_EXECUTORS)
 
+        self._poll_thread.start()
+
     def register_server(self, server_ip: str,
                         manager: ws_manager.WSManager) -> None:
         status = manager.send({'type': 'PING'}, timeout=_POLL_TIMEOUT)

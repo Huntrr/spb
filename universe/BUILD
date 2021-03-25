@@ -6,12 +6,14 @@ py_binary(
     srcs = ["server.py"],
     deps = [
         "//db:connect",
-        "//db/model:ship",
-        "//db/model:user",
+        "//db/models:server_auth",
+        "//db/models:ship",
+        "//db/models:user",
         "//lib:flask_utils",
         "//util:error",
         requirement("absl-py"),
         requirement("Flask"),
+        requirement("Flask-Sockets"),
         requirement("grpcio"),
     ],
 )

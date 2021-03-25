@@ -24,6 +24,7 @@ py_binary(
         "//db/models:server_auth",
         "//db/models:user",
         "//lib:flask_utils",
+        "//util:error",
         requirement("absl-py"),
         requirement("Flask"),
         requirement("Flask-Sockets"),

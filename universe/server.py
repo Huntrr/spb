@@ -10,7 +10,7 @@ import flask
 import grpc
 
 from db import connect
-from db.model import ship, user
+from db.models import server_auth, ship, user
 from lib import flask_utils
 from util import error
 
@@ -22,7 +22,7 @@ app = flask.Flask(__name__)
 
 @app.route('/get_ship')
 @flask_utils.server_required
-def connect_server(_) -> flask.Response:
+def get_ship(_) -> flask.Response:
     data = flask.request.json
     object_id = bson.objectid.ObjectId(data['ship_id'])
     the_ship = ship.objects(id=ship_id).first()
@@ -34,7 +34,7 @@ def connect_server(_) -> flask.Response:
 
 @app.route('/get_player')
 @flask_utils.server_required
-def connect_server(_) -> flask.Response:
+def get_player(_) -> flask.Response:
     data = flask.request.json
     object_id = bson.objectid.ObjectId(data['ship_id'])
     the_user = user.objects(id=user_id).first()
@@ -54,7 +54,7 @@ def main(_) -> None:
     logging.info('Connecting to database')
     connect.connect()
 
-    logging.info(f'Launching gateway server on :{FLAGS.port}')
+    logging.info(f'Launching universe server on :{FLAGS.port}')
     server = pywsgi.WSGIServer(
         ('', FLAGS.port), app, handler_class=WebSocketHandler)
     server.serve_forever()
