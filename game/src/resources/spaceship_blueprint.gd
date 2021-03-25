@@ -71,6 +71,11 @@ func from_string(json: String) -> SpaceshipBlueprint:
 	return self
 
 
+func from_cells(cells_: Array) -> SpaceshipBlueprint:
+	cells = cells_
+	return self
+
+
 func _init(cells_: Array = []) -> void:
 	cells = cells_
 

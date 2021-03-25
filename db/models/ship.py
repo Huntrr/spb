@@ -10,6 +10,9 @@ class Ship(me.Document):
 
     blueprint = me.ListField(me.DictField())
 
+    def to_dict(self) -> dict:
+        return dict(blueprint=blueprint)
+
 
 class VirtualShip(Ship):
     """A ship that exists only in a given simulator battle."""

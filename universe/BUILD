@@ -6,6 +6,8 @@ py_binary(
     srcs = ["server.py"],
     deps = [
         "//db:connect",
+        "//db/model:ship",
+        "//db/model:user",
         "//lib:flask_utils",
         "//util:error",
         requirement("absl-py"),

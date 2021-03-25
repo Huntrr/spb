@@ -17,7 +17,7 @@ const dict = {
 }
 const SESSION_PATH = "user://session.dat"
 
-var _session_jwt: String = ""
+var session_jwt: String = ""
 var session_user: Dictionary = {}
 
 func addresses() -> Dictionary:
@@ -29,7 +29,7 @@ func _ready() -> void:
 	if file.open(SESSION_PATH, File.READ) == OK:
 		var text = file.get_as_text()
 		if text.empty():
-			_session_jwt = ""
+			session_jwt = ""
 			session_user = {}
 		else:
 			assert(set_session(file.get_as_text()).ok())
@@ -49,7 +49,7 @@ func log_out(status: Status = Status.new()) -> Status:
 
 
 func clear_session() -> void:
-	_session_jwt = ""
+	session_jwt = ""
 	session_user = {}
 	
 	var file = File.new()
@@ -59,7 +59,7 @@ func clear_session() -> void:
 
 
 func set_session(jwt: String) -> Status:
-	_session_jwt = jwt
+	session_jwt = jwt
 	var encoded_user: String = jwt.split('.')[1]
 	var str_user: String = Base64Url.base64url_to_utf8(encoded_user)
 	var json_user: JSONParseResult = JSON.parse(str_user)
@@ -84,7 +84,7 @@ func ws_connect(service: String, uri: String) -> StatusOr:
 	var client = WebSocketClient.new()
 	var headers = PoolStringArray()
 	if logged_in():
-		headers.append("Authorization: JWT %s" % _session_jwt)
+		headers.append("Authorization: JWT %s" % session_jwt)
 	
 	var err = client.connect_to_url(full_uri, PoolStringArray(), false, headers)
 	if err != OK:
@@ -99,7 +99,7 @@ func request(
 	var full_uri: String = "%s/%s" % [addresses()[service], uri]
 	var headers: Array = []
 	if logged_in():
-		headers.append("Authorization: JWT %s" % _session_jwt)
+		headers.append("Authorization: JWT %s" % session_jwt)
 	var response_status: StatusOr = yield(
 		Request.request(full_uri, headers, method, body), "completed")
 	if not response_status.ok():

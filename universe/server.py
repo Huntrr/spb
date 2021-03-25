@@ -5,10 +5,12 @@ import functools
 
 from absl import app as base_app
 from absl import flags, logging
+import bson
 import flask
 import grpc
 
 from db import connect
+from db.model import ship, user
 from lib import flask_utils
 from util import error
 
@@ -18,18 +20,28 @@ FLAGS = flags.FLAGS
 
 app = flask.Flask(__name__)
 
-@app.route('/get_ship/<string:ship_id>')
+@app.route('/get_ship')
 @flask_utils.server_required
-def connect_server(_, ship_id: str) -> flask.Response:
-    raise error.SpbError('/get_ship not yet implemented',
-                         501, error.grpc.StatusCode.UNIMPLEMENTED)
+def connect_server(_) -> flask.Response:
+    data = flask.request.json
+    object_id = bson.objectid.ObjectId(data['ship_id'])
+    the_ship = ship.objects(id=ship_id).first()
+    if not the_ship:
+        raise error.SpbError(f'ship {ship_id} not found',
+                             404, grpc.StatusCode.NOT_FOUND)
+    return the_ship.to_dict()
 
 
-@app.route('/get_player/<string:user_id>')
+@app.route('/get_player')
 @flask_utils.server_required
-def connect_server(_, user_id: str) -> flask.Response:
-    raise error.SpbError('/get_player not yet implemented',
-                         501, error.grpc.StatusCode.UNIMPLEMENTED)
+def connect_server(_) -> flask.Response:
+    data = flask.request.json
+    object_id = bson.objectid.ObjectId(data['ship_id'])
+    the_user = user.objects(id=user_id).first()
+    if not the_user:
+        raise error.SpbError(f'user {user_id} not found',
+                             404, grpc.StatusCode.NOT_FOUND)
+    return the_user.player.to_dict()
 
 
 def main(_) -> None:

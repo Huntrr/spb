@@ -39,9 +39,13 @@ func get_pop() -> int:
 
 func create_ship(ship_id: String) -> StatusOr:
 	var room_id = Uuid.v4()
-	var ship: Inside = InsideScene.instance().init(ship_id, room_id)
+	var ship: Inside = InsideScene.instance().init(ship_id, room_id, self)
 	_wrapper.add_child(ship)
 	return StatusOr.new().from_value(room_id)
+
+
+func kick_user(id: int) -> void:
+	_wrapper.rpc_id(id, "kick")
 
 
 func _on_peer_connected(id: int) -> void:
@@ -52,3 +56,5 @@ func _on_peer_connected(id: int) -> void:
 func _on_peer_disconnected(id: int) -> void:
 	Log.info("Got peer disconnected, id=%d" % id)
 	peers.erase(id)
+	for inside in _wrapper.get_children():
+		inside.remove_player(id)
