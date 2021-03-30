@@ -96,7 +96,7 @@ class GameServerManager:
                             # This server no longer has this room.
                             logging.warning(
                                 'Room %s on ship server %s is missing',
-                                server_ip)
+                                room_id, server_ip)
                             self._r.hdel(_SHIP_KEY, ship_id)
                         else:
                             logging.info('Returning server %s for room %s',
@@ -146,7 +146,9 @@ class GameServerManager:
                     })
                     if response and response['successful']:
                         value = f'{server_ip},{response["room_id"]}'
-                        self._hset(_SHIP_KEY, ship_id, value)
+                        status = self._poll(server_ip)
+                        self._r.hset(_STATUS_KEY, server_ip, json.dumps(status))
+                        self._r.hset(_SHIP_KEY, ship_id, value)
                         return
 
 

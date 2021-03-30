@@ -5,7 +5,6 @@ onready var Log = Logger.new(self)
 onready var _splash: Node = $Splash
 
 func _ready():
-	var arguments := {}
 	if "--server" in OS.get_cmdline_args() or OS.has_feature("Server"):
 		Log.info("Starting SPB server")
 		var auth_key: String = OS.get_environment("SPB_AUTH_KEY")

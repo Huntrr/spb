@@ -44,7 +44,6 @@ func _on_data():
 	var data: Dictionary = data_json.result
 	
 	if data.type == "PING":
-		Log.info("Ping!")
 		_send({
 			"type": "PONG",
 			"req_id": data.req_id,

@@ -36,6 +36,8 @@ def connect_server(server_auth: server_auth.ServerAuth, ws) -> None:
     manager = ws_manager.WSManager(ws)
     server_ip = flask.request.environ.get(
         'HTTP_X_FORWARDED_FOR', flask.request.environ['REMOTE_ADDR'])
+    # TODO(hunter): Fix all IPv6 addresses...
+    server_ip = server_ip.replace('::ffff:', '')
     logging.info('Establishing game server connection with %s', server_ip)
 
     _game_server_manager().register_server(server_ip, manager)

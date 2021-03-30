@@ -29,10 +29,11 @@ func _ready() -> void:
 		set_blueprint(ship.blueprint)
 	else:
 		# Introduce self.
+		Log.info("Introducing myself!")
 		rpc("introduce_player", Connection.session_jwt)
 
 func get_pop() -> int:
-	return 0
+	return players.size()
 
 func get_status() -> Dictionary:
 	return {
@@ -41,6 +42,7 @@ func get_status() -> Dictionary:
 	}
 
 master func introduce_player(jwt: String) -> void:
+	Log.info("Got introduction...")
 	var sender_id = multiplayer.get_rpc_sender_id()
 	
 	var encoded_user: String = jwt.split('.')[1]
@@ -57,6 +59,9 @@ master func introduce_player(jwt: String) -> void:
 		$"../".rpc_id(sender_id, "kick")
 		return
 	
+	Log.info("Got player %s" % user.name)
+	
+	# TODO(hunter): Include the JWT to verify this user is themself!
 	var data_status: StatusOr = yield(Connection.request(
 		"universe", "get_player", HTTPClient.METHOD_GET, {
 			"user_id": user.id
@@ -66,11 +71,18 @@ master func introduce_player(jwt: String) -> void:
 		$"../".rpc_id(sender_id, "kick")
 		return
 	
+	Log.info("Verified player %s" % data_status.value)
+	if not multiplayer.network_peer.get_peer_address(sender_id):
+		Log.info(
+			"Peer %d disconnected before they could be verified" % sender_id)
+		return
 	players[sender_id] = data_status.value
 	rpc_id(sender_id, "set_blueprint", _cells)
 
-func remove_player(peer_id: String) -> void:
-	players.erase(peer_id)
+func remove_player(peer_id: int) -> void:
+	var erased = players.erase(peer_id)
+	if not erased:
+		Log.error("Erased peer %d too early" % peer_id)
 
 puppet func set_blueprint(cells: Array) -> void:
 	Log.info('Updating ship blueprint')

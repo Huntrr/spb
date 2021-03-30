@@ -18,7 +18,7 @@ func _notification(what):
 	if what == NOTIFICATION_ENTER_TREE:
 		# We also want to customize all nodes that will be added dynamically
 		# later on.
-		get_tree().connect("node_added", self, "_on_add_node")
+		assert(get_tree().connect("node_added", self, "_on_add_node") == OK)
 		_customize_children()
 	elif what == NOTIFICATION_EXIT_TREE:
 		# Don't forget to disconnect
@@ -26,7 +26,7 @@ func _notification(what):
 
 # When the MultiplayerAPI is not managed directly by the SceneTree
 # we MUST poll it
-func _process(delta):
+func _process(_delta):
 	if not custom_multiplayer.has_network_peer():
 		return # No network peer, nothing to poll
 	# Poll the MultiplayerAPI so it fetches packets, emit signals, process RPCs.
@@ -68,8 +68,9 @@ master func request_join_room(room_id: String) -> void:
 		if child.name == room_id:
 			return
 	
-	multiplayer.get_rpc_sender_id()
-	rpc_id(multiplayer.get_rpc_sender_id(), "kick")
+	var peer_id := multiplayer.get_rpc_sender_id()
+	rpc_id(peer_id, "kick")
+	multiplayer.network_peer.disconnect_peer(peer_id)
 
 puppet func kick() -> void:
 	push_error("Got kicked!")
