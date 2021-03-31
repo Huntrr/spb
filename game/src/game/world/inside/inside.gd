@@ -12,7 +12,7 @@ var players := {}
 func init(ship_id_: String, room_id_: String):
 	_ship_id = ship_id_
 	set_name(room_id_)
-	$Debug/Label.set_text(_ship_id)
+	$Debug/UI/ShipId.set_text(_ship_id)
 	return self
 
 func _ready() -> void:
@@ -83,9 +83,11 @@ func remove_player(peer_id: int) -> void:
 	var erased = players.erase(peer_id)
 	if not erased:
 		Log.error("Erased peer %d too early" % peer_id)
+	else:
+		Log.info("Removed peer id=%d" % peer_id)
 
 puppet func set_blueprint(cells: Array) -> void:
-	Log.info('Updating ship blueprint')
+	Log.info("Updating ship blueprint")
 	_cells = cells
 	var spb := SpaceshipBlueprint.new().from_cells(cells)
 	$Ship.load_from_spb(spb)
