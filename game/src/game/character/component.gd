@@ -11,4 +11,3 @@ func _ready():
 func set_index(index_: int) -> void:
 	index = index_
 	self.frames = outfits.get_sprite_frames(self.name.to_lower(), index)
-	print(index)

@@ -7,10 +7,10 @@ from db.models import ship as _ship
 
 
 class Outfit(me.EmbeddedDocument):
-    base = me.IntValue(min_value=1, required=True, default=1)
-    shirt = me.IntValue(min_value=1, required=True, default=1)
-    pants = me.IntValue(min_value=1, required=True, default=1)
-    eyes = me.IntValue(min_value=1, required=True, default=1)
+    base = me.IntField(min_value=1, required=True, default=1)
+    shirt = me.IntField(min_value=1, required=True, default=1)
+    pants = me.IntField(min_value=1, required=True, default=1)
+    eyes = me.IntField(min_value=1, required=True, default=1)
 
     def to_dict(self) -> dict:
         return dict(

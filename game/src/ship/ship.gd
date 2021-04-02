@@ -1,6 +1,10 @@
 class_name Ship
 extends Node2D
 
+onready var Log := Logger.new(self)
+
+const Player: PackedScene = preload("res://scenes/character/player.tscn")
+
 const CELL_SIZE := 32
 const FLOOR_TILE_NAME := "floor_1"
 const WALL_TILE_NAME := "wall_1"
@@ -28,6 +32,39 @@ enum MaskType {
 
 var mask: Texture = ImageTexture.new()
 
+var node_groups := {}
+
+func add_node_to_group(group: String, node: Node) -> void:
+	# Adds a node a node to an object group.
+	if not (group in node_groups):
+		node_groups[group] = []
+	node_groups[group].append(node)
+
+func spawn_player(peer_id: int, outfit: Dictionary) -> void:
+	var spawns: Array = node_groups["spawn"]
+	if spawns.empty():
+		push_error("No spawns on ship!")
+		return
+	var spawn: Node2D = spawns[randi() % spawns.size()]
+	var spawn_pos: Vector2 = (
+		get_global_transform().inverse() * spawn.get_global_transform()).get_origin()
+	
+	rpc("create_player", peer_id, outfit, spawn_pos)
+	create_player(peer_id, outfit, spawn_pos)
+
+puppet func create_player(
+		peer_id: int, outfit: Dictionary, location: Vector2) -> void:
+	var player: KinematicBody2D = Player.instance().init(peer_id, outfit)
+	_in.add_child(player)
+	player.position = location
+
+puppet func remove_player(peer_id: int) -> void:
+	get_node("In/%d" % peer_id).queue_free()
+
+
+#############
+# LOAD SHIP #
+#############
 func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 	for container in [_base, _in, _wrap, _up, _out]:
 		for child in container.get_children():
@@ -88,7 +125,7 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 				var type := "IN"
 				var instance: ObjectTile = (
 					tile.ship_placement.object.instance().init(
-						rot, type, width, height, bg_dirs))
+						self, rot, type, width, height, bg_dirs))
 				instance.position = position
 				_in.add_child(instance)
 			
@@ -96,7 +133,7 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 				var type := "UP" if blueprint.has_background(coord) else "OUT"
 				var instance: ObjectTile = (
 					tile.ship_placement.exterior_object.instance().init(
-					rot, type, width, height, bg_dirs))
+						self, rot, type, width, height, bg_dirs))
 				instance.position = position
 				
 				var layer: YSort = _up if type == "UP" else _out

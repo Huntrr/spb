@@ -1,4 +1,4 @@
-[gd_scene load_steps=83 format=2]
+[gd_scene load_steps=85 format=2]
 
 [ext_resource path="res://src/game/character/character.gd" type="Script" id=1]
 [ext_resource path="res://src/game/character/component.gd" type="Script" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://assets/entities/character/eyes/1.png" type="Texture" id=4]
 [ext_resource path="res://assets/entities/character/shirt/1.png" type="Texture" id=5]
 [ext_resource path="res://assets/entities/character/base/1.png" type="Texture" id=6]
+[ext_resource path="res://src/game/character/player.gd" type="Script" id=7]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 6 )
@@ -387,7 +388,11 @@ animations = [ {
 "speed": 5.0
 } ]
 
-[node name="Player" type="Node2D"]
+[sub_resource type="RectangleShape2D" id=77]
+extents = Vector2( 5.90302, 3.86119 )
+
+[node name="Player" type="KinematicBody2D"]
+script = ExtResource( 7 )
 
 [node name="Character" type="Node2D" parent="."]
 script = ExtResource( 1 )
@@ -411,3 +416,7 @@ script = ExtResource( 2 )
 frames = SubResource( 76 )
 animation = "idle"
 script = ExtResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0, 12 )
+shape = SubResource( 77 )

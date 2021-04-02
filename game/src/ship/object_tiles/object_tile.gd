@@ -21,9 +21,12 @@ const _OUT_BORDER = 5
 onready var _offset = $Offset
 onready var _rotation_view_manager = $Offset/RotationViewManager
 
+var ship: Node
 
-func init(rot_: int, placement_type_: String, width_ := 1, height_ := 1,
+
+func init(ship_: Node, rot_: int, placement_type_: String, width_ := 1, height_ := 1,
 		bg_dirs_ := []):
+	ship = ship_
 	_rot = rot_
 	placement_type = placement_type_
 	width = width_

@@ -78,6 +78,7 @@ master func introduce_player(jwt: String) -> void:
 		return
 	players[sender_id] = data_status.value
 	rpc_id(sender_id, "set_blueprint", _cells)
+	$Ship.spawn_player(sender_id, players[sender_id].outfit)
 
 func remove_player(peer_id: int) -> void:
 	var erased = players.erase(peer_id)
@@ -85,6 +86,9 @@ func remove_player(peer_id: int) -> void:
 		Log.error("Erased peer %d too early" % peer_id)
 	else:
 		Log.info("Removed peer id=%d" % peer_id)
+		
+	$Ship.rpc("remove_player", peer_id)
+	$Ship.remove_player(peer_id)
 
 puppet func set_blueprint(cells: Array) -> void:
 	Log.info("Updating ship blueprint")
