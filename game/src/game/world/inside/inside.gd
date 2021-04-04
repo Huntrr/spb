@@ -12,7 +12,9 @@ var players := {}
 func init(ship_id_: String, room_id_: String):
 	_ship_id = ship_id_
 	set_name(room_id_)
-	$Debug/UI/ShipId.set_text(_ship_id)
+	$Pinger.room_id = room_id_
+	$Debug/UI/Stats/RightStats/ShipId.set_text("ship id: %s" % _ship_id)
+	$Debug/UI/Stats/RightStats/RoomId.set_text("room id: %s" % room_id_)
 	return self
 
 func _ready() -> void:
@@ -77,8 +79,12 @@ master func introduce_player(jwt: String) -> void:
 			"Peer %d disconnected before they could be verified" % sender_id)
 		return
 	players[sender_id] = data_status.value
+	InNetworkState.add_peer(sender_id, name)
 	rpc_id(sender_id, "set_blueprint", _cells)
-	$Ship.spawn_player(sender_id, players[sender_id].outfit)
+	$Ship.spawn_player(sender_id, {
+		'username': user.name,
+		'outfit': players[sender_id].outfit,
+	})
 
 func remove_player(peer_id: int) -> void:
 	var erased = players.erase(peer_id)
@@ -86,7 +92,8 @@ func remove_player(peer_id: int) -> void:
 		Log.error("Erased peer %d too early" % peer_id)
 	else:
 		Log.info("Removed peer id=%d" % peer_id)
-		
+	
+	InNetworkState.remove_peer(peer_id)
 	$Ship.rpc("remove_player", peer_id)
 	$Ship.remove_player(peer_id)
 

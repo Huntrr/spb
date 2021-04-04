@@ -1,11 +1,11 @@
 extends Node2D
 
-var _outfit: Dictionary
+var _info: Dictionary
 
-func init(peer_id: int, outfit_: Dictionary):
+func init(peer_id: int, player_info_: Dictionary):
 	name = "%d" % peer_id
-	_outfit = outfit_
+	_info = player_info_
 	return self
 
 func _ready():
-	$Character.set_outfit(_outfit)
+	$Character.set_outfit(_info.outfit)

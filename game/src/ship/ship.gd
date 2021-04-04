@@ -40,7 +40,7 @@ func add_node_to_group(group: String, node: Node) -> void:
 		node_groups[group] = []
 	node_groups[group].append(node)
 
-func spawn_player(peer_id: int, outfit: Dictionary) -> void:
+func spawn_player(peer_id: int, player_info: Dictionary) -> void:
 	var spawns: Array = node_groups["spawn"]
 	if spawns.empty():
 		push_error("No spawns on ship!")
@@ -49,12 +49,12 @@ func spawn_player(peer_id: int, outfit: Dictionary) -> void:
 	var spawn_pos: Vector2 = (
 		get_global_transform().inverse() * spawn.get_global_transform()).get_origin()
 	
-	rpc("create_player", peer_id, outfit, spawn_pos)
-	create_player(peer_id, outfit, spawn_pos)
+	rpc("create_player", peer_id, player_info, spawn_pos)
+	create_player(peer_id, player_info, spawn_pos)
 
 puppet func create_player(
-		peer_id: int, outfit: Dictionary, location: Vector2) -> void:
-	var player: KinematicBody2D = Player.instance().init(peer_id, outfit)
+		peer_id: int, player_info: Dictionary, location: Vector2) -> void:
+	var player: KinematicBody2D = Player.instance().init(peer_id, player_info)
 	_in.add_child(player)
 	player.position = location
 
