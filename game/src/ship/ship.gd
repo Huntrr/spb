@@ -1,6 +1,8 @@
 class_name Ship
 extends Node2D
 
+signal spawned_self(player)
+
 onready var Log := Logger.new(self)
 
 const Player: PackedScene = preload("res://scenes/character/player.tscn")

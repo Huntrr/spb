@@ -18,7 +18,7 @@ func _ready() -> void:
 		timer.start(_PING_INTERVAL)
 
 func _send_ping() -> void:
-	if room_id.empty():
+	if room_id.empty() or not (room_id in network_state.room_to_peers):
 		Log.warning("Ping timeout before room_id is set.")
 		return
 	for peer_id in network_state.room_to_peers[room_id]:
