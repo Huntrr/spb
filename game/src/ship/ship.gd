@@ -42,8 +42,13 @@ func add_node_to_group(group: String, node: Node) -> void:
 		node_groups[group] = []
 	node_groups[group].append(node)
 
+func get_nodes_in_group(group: String) -> Array:
+	if not (group in node_groups):
+		return []
+	return node_groups[group]
+
 func spawn_player(peer_id: int, player_info: Dictionary) -> void:
-	var spawns: Array = node_groups["spawn"]
+	var spawns: Array = get_nodes_in_group("spawn")
 	if spawns.empty():
 		push_error("No spawns on ship!")
 		return
@@ -59,9 +64,12 @@ puppet func create_player(
 	var player: KinematicBody2D = Player.instance().init(peer_id, player_info)
 	_in.add_child(player)
 	player.position = location
+	player.set_mask(mask, float(CELL_SIZE / 2.0))
 
 puppet func remove_player(peer_id: int) -> void:
-	get_node("In/%d" % peer_id).queue_free()
+	var node: Node = get_node("In/%d" % peer_id)
+	if node:
+		get_node("In/%d" % peer_id).queue_free()
 
 
 #############
@@ -145,29 +153,32 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 	
 	# Build the full interior mask for this ship.
 	var mask_image: Image = Image.new()
-	mask_image.create(max_x * 2, max_y * 2 + 2, false, Image.FORMAT_RGBA8)
+	mask_image.create(max_x * 2 + 4, max_y * 2 + 6, false, Image.FORMAT_RGBA8)
 	mask_image.lock()
 	for x in range(max_x):
 		for y in range(max_y + 1):
 			if mask_cells.has(Vector2(x, y - 1)):
 				match mask_cells[Vector2(x, y - 1)]:
 					MaskType.FULL:
-						mask_image.set_pixel(x * 2, y * 2, Color.black)
-						mask_image.set_pixel(x * 2 + 1, y * 2, Color.black)
-						mask_image.set_pixel(x * 2, y * 2 + 1, Color.black)
-						mask_image.set_pixel(x * 2 + 1, y * 2 + 1, Color.black)
+						mask_image.set_pixel(x * 2 + 2, y * 2 + 2, Color.black)
+						mask_image.set_pixel(x * 2 + 3, y * 2 + 2, Color.black)
+						mask_image.set_pixel(x * 2 + 2, y * 2 + 3, Color.black)
+						mask_image.set_pixel(x * 2 + 3, y * 2 + 3, Color.black)
 					
 					MaskType.HALF:
-						mask_image.set_pixel(x * 2, y * 2 + 1, Color.black)
-						mask_image.set_pixel(x * 2 + 1, y * 2 + 1, Color.black)
+						mask_image.set_pixel(x * 2 + 2, y * 2 + 3, Color.black)
+						mask_image.set_pixel(x * 2 + 3, y * 2 + 3, Color.black)
 	mask_image.unlock()
 	
 	mask.create_from_image(mask_image, 0)
 	var mask_ratio: Vector2 = _wrap.texture.get_size() / mask.get_size();
 	
-	_wrap.region_rect.position = Vector2(0, -1) * CELL_SIZE
-	_wrap.region_rect.end = Vector2(max_x, max_y + 1) * CELL_SIZE
-	_wrap.position = Vector2(0, -2) * CELL_SIZE
+	_wrap.region_rect.end = Vector2(max_x + 2, max_y + 2) * CELL_SIZE
+	_wrap.position = Vector2(-1, -1) * CELL_SIZE
 	_wrap.material.set_shader_param("alpha_mask", mask)
+	_wrap.material.set_shader_param("mask_offset", Vector2(0, -1) * CELL_SIZE)
 	_wrap.material.set_shader_param("cell_size", float(CELL_SIZE / 2.0))
 	_wrap.material.set_shader_param("mask_ratio", mask_ratio)
+	
+	for player in get_nodes_in_group("players"):
+		player.set_mask(mask, float(CELL_SIZE / 2.0))

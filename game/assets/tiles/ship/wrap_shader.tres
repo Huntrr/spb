@@ -1,0 +1,23 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform sampler2D alpha_mask : hint_albedo;
+uniform float cell_size;
+uniform vec2 mask_ratio;
+uniform vec2 mask_offset = vec2(0.0, 0.0);
+
+void fragment() {
+  float alpha = texture(
+	alpha_mask,
+	(UV - mask_offset * TEXTURE_PIXEL_SIZE) * mask_ratio / cell_size).a;
+  COLOR = vec4(texture(TEXTURE, UV).rgb, texture(TEXTURE, UV).a * alpha);
+  COLOR = vec4(alpha, alpha, alpha, 1);
+}"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/cell_size = 16.0
+shader_param/mask_ratio = null
+shader_param/mask_offset = Vector2( 0, 0 )
