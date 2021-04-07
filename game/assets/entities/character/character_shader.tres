@@ -1,0 +1,34 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform sampler2D alpha_mask : hint_albedo;
+uniform float cell_size;
+uniform vec2 mask_ratio;
+uniform vec2 mask_offset;
+uniform vec2 texture_offset;
+uniform vec2 texture_size;
+uniform bool flip_h;
+
+void fragment() {
+  vec2 pos_unflip = (UV - texture_offset * TEXTURE_PIXEL_SIZE);
+  vec2 pos_flip = vec2(
+    texture_size.x * TEXTURE_PIXEL_SIZE.x - pos_unflip.x, pos_unflip.y);
+  vec2 pos = flip_h ? pos_flip : pos_unflip;
+
+  vec2 player_offset = mask_offset * TEXTURE_PIXEL_SIZE;
+  vec2 ship_offset = vec2(cell_size, 3.0 * cell_size) * TEXTURE_PIXEL_SIZE;
+  float alpha = texture(alpha_mask,
+    (ship_offset + player_offset + pos) * mask_ratio / cell_size).a;
+  COLOR = vec4(texture(TEXTURE, UV).rgb, texture(TEXTURE, UV).a * alpha);
+}"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/cell_size = 16.0
+shader_param/mask_ratio = null
+shader_param/mask_offset = Vector2( 0, 0 )
+shader_param/texture_offset = null
+shader_param/texture_size = null
+shader_param/flip_h = null

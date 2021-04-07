@@ -10,10 +10,9 @@ uniform vec2 mask_offset = vec2(0.0, 0.0);
 
 void fragment() {
   float alpha = texture(
-	alpha_mask,
-	(UV - mask_offset * TEXTURE_PIXEL_SIZE) * mask_ratio / cell_size).a;
+    alpha_mask,
+    (UV - mask_offset * TEXTURE_PIXEL_SIZE) * mask_ratio / cell_size).a;
   COLOR = vec4(texture(TEXTURE, UV).rgb, texture(TEXTURE, UV).a * alpha);
-  COLOR = vec4(alpha, alpha, alpha, 1);
 }"
 
 [resource]

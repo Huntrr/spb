@@ -24,19 +24,24 @@ func _process(delta) -> void:
 		# Randomly shift the frame forward or back, or stay still
 		var anim_dir = randi() % 3 - 1
 		for child in get_children():
-			child.frame += 0 #anim_dir
+			child.frame += anim_dir
+		_update_texture_offset()
 
 func set_mask(mask: Texture, cell_size: float) -> void:
 	for child in get_children():
 		child.material.set_shader_param("alpha_mask", mask)
-		child.material.set_shader_param("cell_size", 1.0)
+		child.material.set_shader_param("cell_size", cell_size)
 		child.material.set_shader_param(
 			"mask_ratio",
-			child.frames.get_frame("idle", 0).get_size() / mask.get_size())
+			child.frames.get_frame("idle", 0).atlas.get_size() / mask.get_size())
+		child.material.set_shader_param(
+			"texture_size",
+			child.frames.get_frame("idle", 0).get_size())
 
 func set_mask_offset(offset: Vector2) -> void:
 	for child in get_children():
-		child.material.set_shader_param("mask_offset", offset)
+		child.material.set_shader_param("mask_offset", offset + position)
+	_update_texture_offset()
 
 func set_outfit(outfit: Dictionary) -> void:
 	for child in get_children():
@@ -62,7 +67,6 @@ func animate_walking(forward: bool) -> void:
 	for child in get_children():
 		child.play("walk", not forward)
 		child.speed_scale = 2.0
-		child.stop()
 		child.frame = 0
 
 func animate_idle() -> void:
@@ -77,3 +81,12 @@ func animate_idle() -> void:
 		child.animation = "idle"
 		child.stop()
 		child.frame = 0
+
+func _update_texture_offset() -> void:
+	for child in get_children():
+		var texture: AtlasTexture = child.frames.get_frame(
+			child.animation, child.frame)
+		child.material.set_shader_param(
+			"texture_offset", texture.region.position)
+		child.material.set_shader_param(
+			"flip_h", flip_h)

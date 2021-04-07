@@ -11,6 +11,8 @@ var _vx = 0
 var _info: Dictionary
 var _peer_id: int
 
+var _me: bool = false
+
 onready var _character: Node = $Character
 
 func init(peer_id_: int, player_info_: Dictionary):
@@ -26,6 +28,7 @@ func _ready():
 	_character.set_outfit(_info.outfit)
 	
 	if _peer_id == multiplayer.get_network_unique_id():
+		_me = true
 		$Camera2D.make_current()
 	
 	$"../../".add_node_to_group("players", self)
@@ -47,18 +50,19 @@ func _process(delta: float) -> void:
 			_character.animate_walking(false)
 		else:
 			_character.animate_walking(true)
-			
-	_character.set_mask_offset(-position)
+	
+	_character.set_mask_offset(position)
 
 func _physics_process(delta: float) -> void:
-	if Input.is_action_pressed("game_down"):
-		_vy = min(max(0, _vy) + _ACCEL * delta, _MAX_VELOCITY)
-	if Input.is_action_pressed("game_up"):
-		_vy = max(min(0, _vy) - _ACCEL * delta, -_MAX_VELOCITY)
-	if Input.is_action_pressed("game_right"):
-		_vx = min(max(0, _vx) + _ACCEL * delta, _MAX_VELOCITY)
-	if Input.is_action_pressed("game_left"):
-		_vx = max(min(0, _vx) - _ACCEL * delta, -_MAX_VELOCITY)
+	if _me:
+		if Input.is_action_pressed("game_down"):
+			_vy = min(max(0, _vy) + _ACCEL * delta, _MAX_VELOCITY)
+		if Input.is_action_pressed("game_up"):
+			_vy = max(min(0, _vy) - _ACCEL * delta, -_MAX_VELOCITY)
+		if Input.is_action_pressed("game_right"):
+			_vx = min(max(0, _vx) + _ACCEL * delta, _MAX_VELOCITY)
+		if Input.is_action_pressed("game_left"):
+			_vx = max(min(0, _vx) - _ACCEL * delta, -_MAX_VELOCITY)
 	
 	if _vy > 0:
 		_vy = max(0, _vy - _FRICTION * delta)
@@ -75,5 +79,4 @@ func _physics_process(delta: float) -> void:
 		_vx = 0
 	
 	var move_vector := Vector2(_vx, _vy) * delta
-	#move_and_collide(move_vector)
-	position += move_vector
+	move_and_collide(move_vector)

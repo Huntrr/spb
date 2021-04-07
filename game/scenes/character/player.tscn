@@ -7,7 +7,7 @@
 [ext_resource path="res://assets/entities/character/shirt/1.png" type="Texture" id=5]
 [ext_resource path="res://assets/entities/character/base/1.png" type="Texture" id=6]
 [ext_resource path="res://src/game/character/player.gd" type="Script" id=7]
-[ext_resource path="res://assets/tiles/ship/wrap_shader.tres" type="Material" id=8]
+[ext_resource path="res://assets/entities/character/character_shader.tres" type="Material" id=8]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 6 )
