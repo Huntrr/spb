@@ -62,8 +62,8 @@ func spawn_player(peer_id: int, player_info: Dictionary) -> void:
 puppet func create_player(
 		peer_id: int, player_info: Dictionary, location: Vector2) -> void:
 	var player: KinematicBody2D = Player.instance().init(peer_id, player_info)
-	_in.add_child(player)
 	player.position = location
+	_in.add_child(player)
 	player.set_mask(mask, float(CELL_SIZE / 2.0))
 
 puppet func remove_player(peer_id: int) -> void:

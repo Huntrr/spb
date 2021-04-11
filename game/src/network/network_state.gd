@@ -8,6 +8,9 @@ var room_to_rtt := {}  # Min RTT per room.
 var peer_to_room := {}
 var room_to_peers := {}
 
+func get_room_peers(peer_id: int) -> Array:
+	return room_to_peers[peer_to_room[peer_id]]
+
 func get_latency(peer_id: int) -> float:
 	if not peer_id in rtts:
 		return -1.0
