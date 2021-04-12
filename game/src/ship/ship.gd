@@ -45,7 +45,19 @@ func add_node_to_group(group: String, node: Node) -> void:
 func get_nodes_in_group(group: String) -> Array:
 	if not (group in node_groups):
 		return []
+	var nodes := []
+	for node in node_groups[group]:
+		if node:
+			nodes.append(node)
+	node_groups[group] = nodes
 	return node_groups[group]
+
+func introduce_player(peer_id: int) -> void:
+	# Sends a new player all the current players on this ship.
+	var players: Array = get_nodes_in_group("players")
+	for player in players:
+		rpc_id(peer_id, "create_player",
+			player.peer_id, player.info, player.position)
 
 func spawn_player(peer_id: int, player_info: Dictionary) -> void:
 	var spawns: Array = get_nodes_in_group("spawn")
@@ -137,6 +149,7 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 					tile.ship_placement.object.instance().init(
 						self, rot, type, width, height, bg_dirs))
 				instance.position = position
+				instance.name = "%s-%s_%s-%s" % [type, cell.id, cell.x, cell.y]
 				_in.add_child(instance)
 			
 			if tile.ship_placement.exterior_object != null:
@@ -147,6 +160,7 @@ func load_from_spb(blueprint: SpaceshipBlueprint) -> void:
 				instance.position = position
 				
 				var layer: YSort = _up if type == "UP" else _out
+				instance.name = "%s-%s_%s-%s" % [type, cell.id, cell.x, cell.y]
 				layer.add_child(instance)
 	
 	_base.update_bitmask_region()

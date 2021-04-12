@@ -81,6 +81,7 @@ master func introduce_player(jwt: String) -> void:
 	players[sender_id] = data_status.value
 	InNetworkState.add_peer(sender_id, name)
 	rpc_id(sender_id, "set_blueprint", _cells)
+	$Ship.introduce_player(sender_id)
 	$Ship.spawn_player(sender_id, {
 		'username': user.name,
 		'outfit': players[sender_id].outfit,

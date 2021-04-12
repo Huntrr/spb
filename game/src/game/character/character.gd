@@ -2,7 +2,7 @@ extends Node2D
 
 var flip_h = false setget set_flip_h
 
-enum Anim {IDLE, SIT, WALK_FORWARD, WALK_BACK}
+enum Anim {NONE, IDLE, SIT, WALK_FORWARD, WALK_BACK}
 var anim = Anim.IDLE
 
 enum Action {NONE, ROLL}
@@ -16,6 +16,8 @@ func _ready() -> void:
 	
 	for child in get_children():
 		child.material = child.material.duplicate()
+	
+	assert($Base.connect("animation_finished", self, "_on_animation_finished") == OK)
 	
 func _process(delta) -> void:
 	timer += delta
@@ -66,7 +68,6 @@ func animate_walking(forward: bool) -> void:
 	
 	for child in get_children():
 		child.play("walk", not forward)
-		child.speed_scale = 2.0
 		child.frame = 0
 
 func animate_idle() -> void:
@@ -82,6 +83,16 @@ func animate_idle() -> void:
 		child.stop()
 		child.frame = 0
 
+func animate_roll() -> void:
+	if action == Action.ROLL:
+		return
+	action = Action.ROLL
+	anim = Anim.NONE
+	
+	for child in get_children():
+		child.play("roll")
+		child.frame = 0
+
 func _update_texture_offset() -> void:
 	for child in get_children():
 		var texture: AtlasTexture = child.frames.get_frame(
@@ -90,3 +101,6 @@ func _update_texture_offset() -> void:
 			"texture_offset", texture.region.position)
 		child.material.set_shader_param(
 			"flip_h", flip_h)
+
+func _on_animation_finished() -> void:
+	action = Action.NONE

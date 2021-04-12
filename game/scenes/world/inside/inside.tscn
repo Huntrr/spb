@@ -4,10 +4,10 @@
 [ext_resource path="res://scenes/ship/ship.tscn" type="PackedScene" id=2]
 [ext_resource path="res://src/network/pinger.gd" type="Script" id=3]
 
-[sub_resource type="StyleBoxFlat" id=2]
+[sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.12549, 0.12549, 0.12549, 0.764706 )
 
-[sub_resource type="GDScript" id=1]
+[sub_resource type="GDScript" id=2]
 script/source = "extends Label
 
 
@@ -54,8 +54,8 @@ custom_constants/separation = 0
 [node name="InNetworkStats" type="Label" parent="Debug/UI/Stats/LeftStats"]
 margin_right = 506.0
 margin_bottom = 14.0
-custom_styles/normal = SubResource( 2 )
-script = SubResource( 1 )
+custom_styles/normal = SubResource( 1 )
+script = SubResource( 2 )
 
 [node name="RightStats" type="VSplitContainer" parent="Debug/UI/Stats"]
 margin_left = 518.0
