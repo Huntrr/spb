@@ -6,7 +6,6 @@ const PositionMarker: PackedScene = (
 
 # Controls prediction interpolation.
 const _INTERPOLATE_AMOUNT := 0.1
-const _INTERPOLATE_AMOUNT_ROLL := 0.01
 
 var _physics := PlayerPhysics.new()
 var _input_history := InputHistory.new()
@@ -85,12 +84,13 @@ func _physics_process(delta: float) -> void:
 	_predicted_position.move_and_collide(
 		_predicted_physics.get_movement(delta, input))
 	
-	if _physics.roll_count == 0:
-		position = position.linear_interpolate(
-			_predicted_position.position, _INTERPOLATE_AMOUNT)
+	if _predicted_physics.roll:
+		_predicted_position.set_color(Color.fuchsia)
 	else:
-		position = position.linear_interpolate(
-			_predicted_position.position, _INTERPOLATE_AMOUNT_ROLL)
+		_predicted_position.set_color(Color.blue)
+	
+	position = position.linear_interpolate(
+		_predicted_position.position, _INTERPOLATE_AMOUNT)
 	
 
 func _unhandled_key_input(event: InputEventKey) -> void:
@@ -158,11 +158,11 @@ puppet func _client_set_state(
 	_last_network_ts = timestamp
 	
 	_latest_input = input_
+	
 	_input_history.clear_before(timestamp)
 	
 	# Replay old inputs on top of new networked position...
 	var new_physics = PlayerPhysics.new().from_dict(physics_)
-	new_physics.roll_up = false  # TODO(hunter): Fix roll predictions!
 	_last_position.position = position_
 	var prev_position: Vector2 = _predicted_position.position
 	_predicted_position.position = position_

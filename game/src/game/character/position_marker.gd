@@ -7,3 +7,6 @@ func init(collider: CollisionShape2D, scale: Vector2, color: Color):
 	$Sprite.scale = scale
 	$Sprite.modulate = color
 	return self
+
+func set_color(color: Color):
+	$Sprite.modulate = color

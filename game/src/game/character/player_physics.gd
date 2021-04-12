@@ -24,9 +24,9 @@ func to_dict() -> Dictionary:
 	return {
 		"velocity": velocity,
 		"roll": roll,
-		"roll_timer": 0,
-		"roll_count": 0,
-		"roll_up": true,
+		"roll_timer": roll_timer,
+		"roll_count": roll_count,
+		"roll_up": roll_up,
 	}
 func from_dict(dict: Dictionary):
 	velocity = dict.velocity

@@ -20,17 +20,17 @@ func add_input(timestamp: int, input: Dictionary) -> void:
 	inputs.insert(index, input)
 
 func get_input(timestamp: int) -> Dictionary:
-	var index = timestamps.bsearch(timestamp)
-	if index < timestamps.size() and timestamps[index] == timestamp:
-		return inputs[index]
-	if index == 0:
+	if timestamps.empty():
 		return EMPTY_INPUT
+	var index = timestamps.bsearch(timestamp)
+	if index < timestamps.size() and timestamps[index] == timestamp or index == 0:
+		return inputs[index]
 	return inputs[index - 1]
 
 func get_min_timestamp() -> int:
 	return OS.get_system_time_msecs() if timestamps.empty() else timestamps[0]
 
 func clear_before(timestamp: int) -> void:
-	while not timestamps.empty() and timestamps.front() < timestamp:
+	while timestamps.size() > 1 and timestamps.front() < timestamp:
 		timestamps.pop_front()
 		inputs.pop_front()
