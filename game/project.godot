@@ -227,6 +227,12 @@ game_roll={
 
 pointing/emulate_touch_from_mouse=true
 
+[layer_names]
+
+2d_physics/layer_1="inside tiles"
+2d_physics/layer_2="player"
+2d_physics/layer_3="inside interactable"
+
 [rendering]
 
 quality/driver/driver_name="GLES2"

@@ -19,7 +19,7 @@ const _OUT_OFFSET = -16
 const _OUT_BORDER = 5
 
 onready var _offset = $Offset
-onready var _rotation_view_manager = $Offset/RotationViewManager
+onready var rotation_view_manager = $Offset/RotationViewManager
 
 var ship: Node
 
@@ -36,7 +36,7 @@ func init(ship_: Node, rot_: int, placement_type_: String, width_ := 1, height_ 
 
 
 func _ready() -> void:
-	_rotation_view_manager.rot = _rot
+	rotation_view_manager.rot = _rot
 	
 	if placement_type == "OUT":
 		set_mount_dir(-Rotation.get_dir(_rot))

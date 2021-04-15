@@ -1,5 +1,7 @@
 extends Node2D
 
+signal set_node(node)
+
 export(PackedScene) var _DownView
 export(PackedScene) var _LeftView
 export(PackedScene) var _UpView
@@ -60,6 +62,7 @@ func _set_rot(rot_: int) -> void:
 	elif scene == _DownView:
 		rotation = Rotation.get_yaw(rot)
 	add_child(_node)
+	emit_signal("set_node", _node)
 
 
 func _coalesce(views: Array) -> PackedScene:

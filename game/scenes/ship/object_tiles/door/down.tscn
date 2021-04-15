@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://assets/tiles/ship/tileset.tres" type="TileSet" id=1]
 
@@ -8,24 +8,56 @@ script/source = "extends Node2D
 export(String) var _up_tile
 export(String) var _down_tile
 
+const _COLLISION_LAYER: int = 1
+
 onready var _tile_map: TileMap = $TileMap
 onready var _up_tile_id: int = _tile_map.tile_set.find_tile_by_name(_up_tile)
 onready var _down_tile_id: int = _tile_map.tile_set.find_tile_by_name(_down_tile)
 
+# Extra collider to handle bottom edge of door (occluded by wall)
+onready var _extra_collider: StaticBody2D = $StaticBody2D
+
 onready var object_tile: ObjectTile = get_parent().object_tile
+onready var collision_area: Area2D = $Area2D
+
+onready var _init_pos = object_tile.position
+onready var _cell_size: Vector2 = _tile_map.cell_size
 
 func _ready():
-	set_state()
+	set_closed()
 
-func set_state(up: bool = true) -> void:
+func set_closed(closed: bool = true) -> void:
 	_tile_map.clear()
-	if up:
-		_tile_map.set_cell(0, -1, _down_tile_id)
+	var y_offset := 0
+	if closed:
+		_tile_map.set_cell(0, -1 + y_offset, _down_tile_id)
+		_tile_map.collision_layer = _COLLISION_LAYER
+		_extra_collider.collision_layer = _COLLISION_LAYER
+		object_tile.position = _init_pos
+	else:
+		_tile_map.collision_layer = 0
+		_extra_collider.collision_layer = 0
+		
+		object_tile.position = _init_pos - Vector2(0, _cell_size.y)
+		y_offset = 1
 	
-	var tile_id: int = _up_tile_id if up else _down_tile_id
 	for i in range(object_tile.height):
-		_tile_map.set_cell(0, i, tile_id)
+		_tile_map.set_cell(0, i + y_offset, _up_tile_id)
+		
+	var tile_id: int = _up_tile_id if closed else _down_tile_id
+	_tile_map.set_cell(0, y_offset, tile_id)
+	
+	_extra_collider.position.y = _cell_size.y * (object_tile.height + y_offset)
+	$Area2D/CollisionShape2D.scale.y = object_tile.height
+	$Area2D/CollisionShape2D.position.y = (
+		_tile_map.cell_size.y / 2) * (object_tile.height + y_offset * 2)
 "
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 12, 16 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 3, 8 )
 
 [node name="Door" type="Node2D"]
 script = SubResource( 1 )
@@ -38,3 +70,14 @@ tile_set = ExtResource( 1 )
 cell_size = Vector2( 32, 32 )
 format = 1
 tile_data = PoolIntArray( 0, 6, 0 )
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource( 2 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2( 0, -8 )
+shape = SubResource( 3 )

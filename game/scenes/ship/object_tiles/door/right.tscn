@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://assets/tiles/ship/tileset.tres" type="TileSet" id=1]
 
@@ -13,17 +13,26 @@ onready var _up_tile_id: int = _tile_map.tile_set.find_tile_by_name(_up_tile)
 onready var _down_tile_id: int = _tile_map.tile_set.find_tile_by_name(_down_tile)
 
 onready var object_tile: ObjectTile = get_parent().object_tile
+onready var collision_area: Area2D = $Area2D
 
 func _ready():
-	set_state()
+	set_closed()
+	
+	$Area2D/CollisionShape2D.scale.x = object_tile.width
+	$Area2D/CollisionShape2D.position.x = (
+		_tile_map.cell_size.x / 2) * (object_tile.width - 1)
+	
 
-func set_state(up: bool = true) -> void:
+func set_closed(closed: bool = true) -> void:
 	_tile_map.clear()
 
-	var tile_id: int = _up_tile_id if up else _down_tile_id
+	var tile_id: int = _up_tile_id if closed else _down_tile_id
 	for i in range(object_tile.width):
 		_tile_map.set_cell(i, 0, tile_id)
 "
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 16, 16 )
 
 [node name="Door" type="Node2D"]
 script = SubResource( 1 )
@@ -36,3 +45,10 @@ tile_set = ExtResource( 1 )
 cell_size = Vector2( 32, 32 )
 format = 1
 tile_data = PoolIntArray( 0, 7, 0 )
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2( 0, 10 )
+shape = SubResource( 2 )
