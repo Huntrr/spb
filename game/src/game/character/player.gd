@@ -35,6 +35,10 @@ func set_mask(mask: Texture, cell_size: float) -> void:
 	# Updates the spaceship mask used to hide parts of this player.
 	_character.set_mask(mask, cell_size)
 
+func is_current_player() -> bool:
+	# Returns true if this player is the current client's character.
+	return _me
+
 func _exit_tree():
 	# Free the network position markers when this player is destroyed.
 	_last_position.queue_free()

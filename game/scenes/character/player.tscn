@@ -393,6 +393,7 @@ animations = [ {
 extents = Vector2( 4.28917, 0.962076 )
 
 [node name="Player" type="KinematicBody2D" groups=[
+"player",
 "sensible",
 ]]
 collision_layer = 2

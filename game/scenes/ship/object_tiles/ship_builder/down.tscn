@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://assets/tiles/ship/objects.png" type="Texture" id=1]
 
@@ -6,5 +6,14 @@
 atlas = ExtResource( 1 )
 region = Rect2( 768, 0, 32, 32 )
 
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 16, 5 )
+
 [node name="Sprite" type="Sprite"]
 texture = SubResource( 1 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2( 0, 11 )
+shape = SubResource( 2 )

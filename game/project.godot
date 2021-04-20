@@ -153,6 +153,7 @@ Connection="*res://src/lib/connection.gd"
 Debug="*res://src/game/debug.gd"
 InNetworkState="*res://src/network/network_state.gd"
 OutNetworkState="*res://src/network/network_state.gd"
+KeyListenerOrchestrator="*res://src/game/world/key_listener_orchestrator.gd"
 
 [debug]
 
@@ -220,6 +221,11 @@ ui_debug={
 game_roll={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":32,"unicode":0,"echo":false,"script":null)
+ ]
+}
+game_use={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":69,"unicode":0,"echo":false,"script":null)
  ]
 }
 
