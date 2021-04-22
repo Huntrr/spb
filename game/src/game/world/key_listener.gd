@@ -2,8 +2,12 @@ extends CanvasLayer
 # Component that can listen to nearby playeys pressing keys, and then
 # trigger other actions.
 
+onready var Log := Logger.new(self)
+
 # Emitted when a player triggers this KeyListener.
 signal triggered(triggering_node)
+# Emitted when a player exits the domain of this KeyListener.
+signal exited(triggering_node)
 
 # Area player must be in to trigger this listener.
 export(NodePath) var _trigger_area
@@ -15,7 +19,7 @@ export(String) var _trigger_action = "game_use"
 export(String) var _trigger_verb = "use"
 export(Vector2) var _position_offset = Vector2(0, -72)
 
-onready var _trigger_area_node: Node = get_node(_trigger_area)
+onready var _trigger_area_node: Area2D = get_node(_trigger_area)
 onready var _panel: PanelContainer = $PanelContainer
 
 var _triggerer: Node = null
@@ -45,6 +49,7 @@ func _on_body_entered(node: Node) -> void:
 
 func _on_body_exited(node: Node) -> void:
 	if node.is_in_group(_triggerer_group) and node.is_current_player():
+		emit_signal("exited", node)
 		_triggerer = null
 		KeyListenerOrchestrator.release_active(_id)
 
@@ -63,5 +68,15 @@ func _process(_delta: float) -> void:
 					 _panel.rect_size / 2.0)
 		if Input.is_action_just_pressed(_trigger_action):
 			emit_signal("triggered", _triggerer)
+			rpc("_trigger", get_path_to(_triggerer))
 	else:
 		_panel.hide()
+
+master func _trigger(node_path: NodePath) -> void:
+	var node: Node = get_node(node_path)
+	if node.peer_id != multiplayer.get_rpc_sender_id():
+		Log.error("Peer %d tried to act as %d" % [
+			multiplayer.get_rpc_sender_id(), node.peer_id])
+		return
+	if _trigger_area_node.overlaps_body(node):
+		emit_signal("triggered", node)

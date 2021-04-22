@@ -59,14 +59,32 @@ func _on_save_pressed() -> void:
 [sub_resource type="GDScript" id=8]
 script/source = "extends FileDialog
 
+onready var Log := Logger.new(self)
 
 const DIR_PREFIX = \"user://blueprints/\"
+const STARTER_PREFIX = \"res://data/starter_ships/\"
 
 
 func _ready() -> void:
 	var dir = Directory.new()
 	dir.open(\"user://\")
 	dir.make_dir(\"blueprints\")
+	dir.change_dir(\"blueprints\")
+	
+	var starter_ships = Directory.new()
+	if starter_ships.open(STARTER_PREFIX) == OK:
+		starter_ships.list_dir_begin(true, true)  # Skip non-files.
+		var file_name = starter_ships.get_next()
+		while file_name != \"\":
+			if starter_ships.current_is_dir() or dir.file_exists(file_name):
+				file_name = starter_ships.get_next()
+				continue
+			
+			Log.info(\"Creating blueprint for %s in %s\" % [
+				STARTER_PREFIX + file_name, DIR_PREFIX + file_name])
+			starter_ships.copy(STARTER_PREFIX + file_name, DIR_PREFIX + file_name)
+			file_name = starter_ships.get_next()
+	starter_ships.list_dir_end()
 	
 	assert(connect(\"dir_selected\", self, \"_on_dir_selected\") == OK)
 

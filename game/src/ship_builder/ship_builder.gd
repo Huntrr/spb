@@ -26,6 +26,8 @@ func _ready() -> void:
 	blueprint.connect("is_error_highlighted", self, "_on_error_is_highlighted")
 
 	validation_errors.connect("is_selected", self, "_on_error_is_selected")
+	
+	$Exit.connect("pressed", self, "_on_exit")
 
 
 func _on_tile_selected(tile: Tile, rotation: int) -> void:
@@ -81,3 +83,6 @@ func _on_error_is_highlighted(position: Vector2) -> void:
 
 func _on_error_is_selected(position: Vector2) -> void:
 	blueprint.focus_tile(position)
+
+func _on_exit() -> void:
+	queue_free()

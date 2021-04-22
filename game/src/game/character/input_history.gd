@@ -9,6 +9,7 @@ const EMPTY_INPUT := {
 	"roll": false,
 	"roll_dir": Vector2.ZERO,
 	"aim": Vector2.ZERO,
+	"sitting": false,
 }
 
 var timestamps := []

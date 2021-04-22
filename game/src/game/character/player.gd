@@ -12,6 +12,9 @@ var _input_history := InputHistory.new()
 var _latest_input := InputHistory.EMPTY_INPUT.duplicate(true)
 var _latest_input_generation := 0
 
+var _sitting := false
+var _last_aim := Vector2.ZERO
+
 var info: Dictionary
 
 var peer_id: int
@@ -39,6 +42,12 @@ func is_current_player() -> bool:
 	# Returns true if this player is the current client's character.
 	return _me
 
+func sit() -> void:
+	_sitting = true
+
+func stand() -> void:
+	_sitting = false
+
 func _exit_tree():
 	# Free the network position markers when this player is destroyed.
 	_last_position.queue_free()
@@ -64,10 +73,14 @@ func _ready():
 func _process(_delta: float) -> void:
 	# Perform an animation processing update for this player.
 	var aim: Vector2 = _get_input().aim
+	var sitting: bool = _get_input().sitting
 	_character.flip_h = aim.x > 0
 	
 	if _physics.velocity.y == 0 && _physics.velocity.x == 0:
-		_character.animate_idle()
+		if sitting:
+			_character.animate_sitting()
+		else:
+			_character.animate_idle()
 	elif _physics.roll != Vector2.ZERO:
 		_character.animate_roll()
 		_character.flip_h = _physics.roll.x > 0
@@ -110,6 +123,8 @@ func _get_input() -> Dictionary:
 	if _me:
 		var roll: bool = Input.is_action_pressed("game_roll")
 		var roll_dir := _physics.velocity.normalized() if roll else Vector2.ZERO
+		if not _sitting:
+			_last_aim = get_local_mouse_position()
 		return {
 			"up": Input.is_action_pressed("game_up"),
 			"down": Input.is_action_pressed("game_down"),
@@ -117,7 +132,8 @@ func _get_input() -> Dictionary:
 			"right": Input.is_action_pressed("game_right"),
 			"roll": roll,
 			"roll_dir": roll_dir,
-			"aim": get_local_mouse_position(),
+			"aim": _last_aim,
+			"sitting": _sitting,
 		}
 	else:
 		return _latest_input

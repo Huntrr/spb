@@ -9,6 +9,7 @@ enum Action {NONE, ROLL}
 var action = Action.NONE
 
 const IDLE_FRAME_INTERVAL := 0.25
+const SIT_FRAME_INTERVAL := 0.50
 var timer := 0.0
 
 func _ready() -> void:
@@ -21,7 +22,9 @@ func _ready() -> void:
 	
 func _process(delta) -> void:
 	timer += delta
-	if anim == Anim.IDLE and timer > IDLE_FRAME_INTERVAL:
+	var new_frame_idle: bool= anim == Anim.IDLE and timer > IDLE_FRAME_INTERVAL
+	var new_frame_sit: bool = anim == Anim.SIT and timer > SIT_FRAME_INTERVAL
+	if new_frame_idle or new_frame_sit:
 		timer = 0.0
 		# Randomly shift the frame forward or back, or stay still
 		var anim_dir = randi() % 3 - 1
@@ -80,6 +83,20 @@ func animate_idle() -> void:
 	
 	for child in get_children():
 		child.animation = "idle"
+		child.stop()
+		child.frame = 0
+
+
+func animate_sitting() -> void:
+	if action != Action.NONE:
+		return
+	
+	if anim == Anim.SIT:
+		return
+	anim = Anim.SIT
+	
+	for child in get_children():
+		child.animation = "sit"
 		child.stop()
 		child.frame = 0
 

@@ -14,7 +14,7 @@ export(float) var _ROLL_GAP = 0.15
 export(float) var _ROLL_COOLDOWN = 1.0
 export(int) var _ROLL_CONSECUTIVE = 3
 
-var velocity := Vector2(0, 0)
+var velocity := Vector2.ZERO
 var roll := Vector2.ZERO
 var roll_timer := 0.0
 var roll_count := 0
@@ -80,6 +80,9 @@ func get_movement(delta: float, input: Dictionary) -> Vector2:
 		velocity.y = 0
 	if abs(velocity.x) < _MIN_VELOCITY:
 		velocity.x = 0
+	
+	if input.sitting:
+		velocity = Vector2.ZERO
 	
 	var move_vector := velocity * delta
 	return move_vector
