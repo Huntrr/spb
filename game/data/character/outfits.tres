@@ -1,14 +1,18 @@
-[gd_resource type="Resource" load_steps=6 format=2]
+[gd_resource type="Resource" load_steps=9 format=2]
 
 [ext_resource path="res://src/resources/outfits.gd" type="Script" id=1]
 [ext_resource path="res://assets/entities/character/pants/1.png" type="Texture" id=2]
 [ext_resource path="res://assets/entities/character/eyes/1.png" type="Texture" id=3]
 [ext_resource path="res://assets/entities/character/shirt/1.png" type="Texture" id=4]
 [ext_resource path="res://assets/entities/character/base/1.png" type="Texture" id=5]
+[ext_resource path="res://assets/entities/character/mouth/2.png" type="Texture" id=6]
+[ext_resource path="res://assets/entities/character/mouth/1.png" type="Texture" id=7]
+[ext_resource path="res://assets/entities/character/eyes/2.png" type="Texture" id=8]
 
 [resource]
 script = ExtResource( 1 )
 bases = [ ExtResource( 5 ) ]
 pants = [ ExtResource( 2 ) ]
 shirts = [ ExtResource( 4 ) ]
-eyes = [ ExtResource( 3 ) ]
+eyes = [ ExtResource( 3 ), ExtResource( 8 ) ]
+mouths = [ ExtResource( 7 ), ExtResource( 6 ) ]

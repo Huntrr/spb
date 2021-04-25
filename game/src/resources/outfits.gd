@@ -6,6 +6,7 @@ export(Array, Texture) var bases
 export(Array, Texture) var pants
 export(Array, Texture) var shirts
 export(Array, Texture) var eyes
+export(Array, Texture) var mouths
 
 const _SPRITE_HEIGHT = 32
 const _SPRITE_WIDTH = 32
@@ -29,6 +30,8 @@ func get_component(component: String) -> Array:
 			return shirts
 		"eyes":
 			return eyes
+		"mouth":
+			return mouths
 	push_error("Invalid component: %s" % component)
 	return []
 

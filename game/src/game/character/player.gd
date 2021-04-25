@@ -12,7 +12,7 @@ var _input_history := InputHistory.new()
 var _latest_input := InputHistory.EMPTY_INPUT.duplicate(true)
 var _latest_input_generation := 0
 
-var _sitting := false
+var using: Node = null
 var _last_aim := Vector2.ZERO
 
 var info: Dictionary
@@ -42,11 +42,27 @@ func is_current_player() -> bool:
 	# Returns true if this player is the current client's character.
 	return _me
 
-func sit() -> void:
-	_sitting = true
+func use(node: Node) -> void:
+	using = node
+	_physics.sitting = true
+	_predicted_physics.sitting = true
+	if multiplayer.is_network_server():
+		for peer in InNetworkState.get_room_peers(peer_id):
+			rpc_id(peer, "_client_use", get_path_to(node))
+
+puppet func _client_use(node_path: NodePath) -> void:
+	use(get_node(node_path))
 
 func stand() -> void:
-	_sitting = false
+	using = null
+	_physics.sitting = false
+	_predicted_physics.sitting = false
+	if multiplayer.is_network_server():
+		for peer in InNetworkState.get_room_peers(peer_id):
+			rpc_id(peer, "_client_stand")
+
+puppet func _client_stand() -> void:
+	stand()
 
 func _exit_tree():
 	# Free the network position markers when this player is destroyed.
@@ -73,11 +89,10 @@ func _ready():
 func _process(_delta: float) -> void:
 	# Perform an animation processing update for this player.
 	var aim: Vector2 = _get_input().aim
-	var sitting: bool = _get_input().sitting
 	_character.flip_h = aim.x > 0
 	
 	if _physics.velocity.y == 0 && _physics.velocity.x == 0:
-		if sitting:
+		if _physics.sitting:
 			_character.animate_sitting()
 		else:
 			_character.animate_idle()
@@ -123,7 +138,7 @@ func _get_input() -> Dictionary:
 	if _me:
 		var roll: bool = Input.is_action_pressed("game_roll")
 		var roll_dir := _physics.velocity.normalized() if roll else Vector2.ZERO
-		if not _sitting:
+		if not using:
 			_last_aim = get_local_mouse_position()
 		return {
 			"up": Input.is_action_pressed("game_up"),
@@ -133,7 +148,6 @@ func _get_input() -> Dictionary:
 			"roll": roll,
 			"roll_dir": roll_dir,
 			"aim": _last_aim,
-			"sitting": _sitting,
 		}
 	else:
 		return _latest_input

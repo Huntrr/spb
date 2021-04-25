@@ -15,6 +15,7 @@ export(float) var _ROLL_COOLDOWN = 1.0
 export(int) var _ROLL_CONSECUTIVE = 3
 
 var velocity := Vector2.ZERO
+var sitting := false
 var roll := Vector2.ZERO
 var roll_timer := 0.0
 var roll_count := 0
@@ -23,6 +24,7 @@ var roll_up := true  # User can't roll by holding space continuously.
 func to_dict() -> Dictionary:
 	return {
 		"velocity": velocity,
+		"sitting": sitting,
 		"roll": roll,
 		"roll_timer": roll_timer,
 		"roll_count": roll_count,
@@ -30,6 +32,7 @@ func to_dict() -> Dictionary:
 	}
 func from_dict(dict: Dictionary):
 	velocity = dict.velocity
+	sitting = dict.sitting
 	roll = dict.roll
 	roll_timer = dict.roll_timer
 	roll_count = dict.roll_count
@@ -81,7 +84,7 @@ func get_movement(delta: float, input: Dictionary) -> Vector2:
 	if abs(velocity.x) < _MIN_VELOCITY:
 		velocity.x = 0
 	
-	if input.sitting:
+	if sitting:
 		velocity = Vector2.ZERO
 	
 	var move_vector := velocity * delta

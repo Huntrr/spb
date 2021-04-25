@@ -11,13 +11,15 @@ class Outfit(me.EmbeddedDocument):
     shirt = me.IntField(min_value=1, required=True, default=1)
     pants = me.IntField(min_value=1, required=True, default=1)
     eyes = me.IntField(min_value=1, required=True, default=1)
+    mouth = me.IntField(min_value=1, required=True, default=1)
 
     def to_dict(self) -> dict:
         return dict(
             base=self.base,
             shirt=self.shirt,
             pants=self.pants,
-            eyes=self.eyes)
+            eyes=self.eyes,
+            mouth=self.mouth)
 
 
 class Location(me.EmbeddedDocument):

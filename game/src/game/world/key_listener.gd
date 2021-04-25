@@ -49,9 +49,10 @@ func _on_body_entered(node: Node) -> void:
 
 func _on_body_exited(node: Node) -> void:
 	if node.is_in_group(_triggerer_group) and node.is_current_player():
-		emit_signal("exited", node)
-		_triggerer = null
-		KeyListenerOrchestrator.release_active(_id)
+		if node.is_current_player() or multiplayer.is_network_server():
+			emit_signal("exited", node)
+			_triggerer = null
+			KeyListenerOrchestrator.release_active(_id)
 
 func _process(_delta: float) -> void:
 	if not _triggerer:

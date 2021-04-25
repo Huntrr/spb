@@ -26,6 +26,7 @@ shape = SubResource( 1 )
 
 [node name="KeyListener" parent="." index="2" instance=ExtResource( 5 )]
 _trigger_area = NodePath("../Area2D")
+_trigger_verb = "CAD"
 
 [node name="ShipBuilderController" type="Node" parent="." index="3"]
 script = ExtResource( 6 )
