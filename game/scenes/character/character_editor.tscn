@@ -1,0 +1,107 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://scenes/character/character.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/ui/panel.tres" type="StyleBox" id=2]
+[ext_resource path="res://assets/ui/x_hover.png" type="Texture" id=3]
+[ext_resource path="res://assets/ui/x.png" type="Texture" id=4]
+[ext_resource path="res://assets/fonts/default.tres" type="DynamicFont" id=5]
+[ext_resource path="res://src/game/character/character_editor.gd" type="Script" id=6]
+[ext_resource path="res://scenes/character/character_editor_button.tscn" type="PackedScene" id=7]
+[ext_resource path="res://src/game/character/outfit_editor.gd" type="Script" id=8]
+
+[node name="CharacterEditor" type="CanvasLayer"]
+layer = 20
+script = ExtResource( 6 )
+
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Popup" type="WindowDialog" parent="Control/CenterContainer"]
+visible = true
+margin_left = 362.0
+margin_top = 99.0
+margin_right = 662.0
+margin_bottom = 499.0
+rect_min_size = Vector2( 300, 400 )
+mouse_filter = 1
+custom_icons/close_highlight = ExtResource( 3 )
+custom_icons/close = ExtResource( 4 )
+custom_styles/panel = ExtResource( 2 )
+custom_fonts/title_font = ExtResource( 5 )
+custom_colors/title_color = Color( 1, 1, 1, 1 )
+window_title = "CHARACTER EDITOR"
+
+[node name="Character" parent="Control/CenterContainer/Popup" instance=ExtResource( 1 )]
+position = Vector2( 150, 200 )
+scale = Vector2( 10, 10 )
+
+[node name="OutfitEditor" type="VBoxContainer" parent="Control/CenterContainer/Popup"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 25
+alignment = 1
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Eyes" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 75.0
+margin_bottom = 105.0
+
+[node name="Mouth" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 130.0
+margin_bottom = 160.0
+
+[node name="Base" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
+colorable = true
+
+[node name="Shirt" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 240.0
+margin_bottom = 270.0
+colorable = true
+
+[node name="Pants" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 295.0
+margin_bottom = 325.0
+colorable = true
+
+[node name="ColorPicker" type="Panel" parent="Control/CenterContainer/Popup"]
+visible = false
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 20.0
+margin_right = 350.0
+margin_bottom = 75.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorPicker" type="ColorPicker" parent="Control/CenterContainer/Popup/ColorPicker"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 17.0
+margin_top = 17.0
+margin_right = 2.0
+margin_bottom = 2.0
+rect_clip_content = true
+edit_alpha = false
+presets_enabled = false
+presets_visible = false
+__meta__ = {
+"_edit_use_anchors_": false
+}

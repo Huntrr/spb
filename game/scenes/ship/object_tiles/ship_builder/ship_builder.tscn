@@ -5,7 +5,7 @@
 [ext_resource path="res://scenes/ship/object_tiles/ship_builder/left.tscn" type="PackedScene" id=3]
 [ext_resource path="res://scenes/ship/object_tiles/ship_builder/down.tscn" type="PackedScene" id=4]
 [ext_resource path="res://scenes/world/key_listener.tscn" type="PackedScene" id=5]
-[ext_resource path="res://src/ship/object_tiles/ship_builder_controller.gd" type="Script" id=6]
+[ext_resource path="res://src/ship/object_tiles/overlay_manager.gd" type="Script" id=6]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 24.0
@@ -28,5 +28,6 @@ shape = SubResource( 1 )
 _trigger_area = NodePath("../Area2D")
 _trigger_verb = "CAD"
 
-[node name="ShipBuilderController" type="Node" parent="." index="3"]
+[node name="ShipBuilderController" type="Node" parent="KeyListener" index="1"]
 script = ExtResource( 6 )
+overlay_path = "res://scenes/ship_builder/ship_builder.tscn"

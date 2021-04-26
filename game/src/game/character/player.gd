@@ -64,6 +64,9 @@ func stand() -> void:
 puppet func _client_stand() -> void:
 	stand()
 
+func get_outfit() -> Dictionary:
+	return $Character.get_outfit()
+
 func _exit_tree():
 	# Free the network position markers when this player is destroyed.
 	_last_position.queue_free()

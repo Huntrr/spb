@@ -1,7 +1,13 @@
 extends Node
+# Simple node that opens an overlay when a user triggers a multi-use station.
+# Set as the child to a KeyListener.
 
 onready var Log := Logger.new(self)
-onready var ShipBuilder: PackedScene = load("res://scenes/ship_builder/ship_builder.tscn")
+
+signal created_overlay(overlay, user)
+
+export(String, FILE) var overlay_path
+onready var overlay: PackedScene = load(overlay_path)
 
 onready var _object_tile = $"../"
 
@@ -9,8 +15,8 @@ var _overlay: Node
 var _local_user: Node
 
 func _ready():
-	$"../KeyListener".connect("triggered", self, "_on_triggered")
-	$"../KeyListener".connect("exited", self, "_on_exited")
+	get_parent().connect("triggered", self, "_on_triggered")
+	get_parent().connect("exited", self, "_on_exited")
 
 func _physics_process(_delta: float) -> void:
 	if _local_user and _local_user.using != _object_tile:
@@ -19,9 +25,10 @@ func _physics_process(_delta: float) -> void:
 func _on_triggered(node: Node) -> void:
 	if node.is_current_player() and node != _local_user:
 		_local_user = node
-		_overlay = ShipBuilder.instance()
+		_overlay = overlay.instance()
 		_overlay.connect("tree_exited", self, "_on_exited", [node])
 		add_child(_overlay)
+		emit_signal("created_overlay", _overlay, _local_user)
 	if node.is_current_player() or multiplayer.is_network_server():
 		node.use(_object_tile)
 

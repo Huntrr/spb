@@ -12,6 +12,8 @@ const IDLE_FRAME_INTERVAL := 0.25
 const SIT_FRAME_INTERVAL := 0.50
 var timer := 0.0
 
+var _outfit: Dictionary
+
 func _ready() -> void:
 	animate_idle()
 	
@@ -51,6 +53,13 @@ func set_mask_offset(offset: Vector2) -> void:
 func set_outfit(outfit: Dictionary) -> void:
 	for child in get_children():
 		child.index = outfit[child.name.to_lower()]
+		var color_key: String = "%s_color" % child.name.to_lower()
+		if color_key in outfit:
+			child.modulate = Color(outfit[color_key])
+	_outfit = outfit
+
+func get_outfit() -> Dictionary:
+	return _outfit.duplicate()
 
 func set_flip_h(flip_h_: bool) -> void:
 	if flip_h == flip_h_:
