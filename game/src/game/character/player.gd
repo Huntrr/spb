@@ -1,4 +1,5 @@
 extends KinematicBody2D
+class_name Player
 
 onready var Log := Logger.new(self)
 const PositionMarker: PackedScene = (
@@ -6,6 +7,9 @@ const PositionMarker: PackedScene = (
 
 # Controls prediction interpolation.
 const _INTERPOLATE_AMOUNT := 0.1
+
+# Offset for hovering nametag.
+const _NAME_OFFSET := -75.0
 
 var _physics := PlayerPhysics.new()
 var _input_history := InputHistory.new()
@@ -20,13 +24,15 @@ var info: Dictionary
 var peer_id: int
 var _me: bool = false
 
-onready var _character: Node = $Character
+onready var _character: Character = $Character
 onready var _last_position: KinematicBody2D = PositionMarker.instance().init(
 	$CollisionShape2D, Vector2(0.3, 0.3), Color.red)
 onready var _predicted_position: KinematicBody2D = PositionMarker.instance().init(
 	$CollisionShape2D, Vector2(0.1, 0.1), Color.blue)
 var _predicted_physics := PlayerPhysics.new()
 var _last_network_ts := 0
+
+onready var _nametag: Label = $Nametag
 
 func init(peer_id_: int, player_info_: Dictionary):
 	name = "%d" % peer_id_
@@ -65,7 +71,18 @@ puppet func _client_stand() -> void:
 	stand()
 
 func get_outfit() -> Dictionary:
-	return $Character.get_outfit()
+	return _character.get_outfit()
+
+func set_outfit(outfit: Dictionary) -> void:
+	_client_set_outfit(outfit)
+	for peer in InNetworkState.get_room_peers(peer_id):
+		rpc_id(peer, "_client_set_outfit", outfit)
+
+puppet func _client_set_outfit(outfit: Dictionary) -> void:
+	_character.set_outfit(outfit)
+	
+	# Update player_info outfit so new players get the update.
+	info.outfit = outfit
 
 func _exit_tree():
 	# Free the network position markers when this player is destroyed.
@@ -74,6 +91,8 @@ func _exit_tree():
 
 func _ready():
 	_character.set_outfit(info.outfit)
+	
+	_nametag.text = info.display_name
 	
 	if peer_id == multiplayer.get_network_unique_id():
 		_me = true
@@ -93,6 +112,10 @@ func _process(_delta: float) -> void:
 	# Perform an animation processing update for this player.
 	var aim: Vector2 = _get_input().aim
 	_character.flip_h = aim.x > 0
+	
+	var nametag_width: float = _nametag.rect_size.x
+	_nametag.rect_position = (
+		Vector2(-nametag_width / 2, _NAME_OFFSET) * _nametag.rect_scale)
 	
 	if _physics.velocity.y == 0 && _physics.velocity.x == 0:
 		if _physics.sitting:

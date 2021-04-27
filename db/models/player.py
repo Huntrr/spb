@@ -14,18 +14,18 @@ def _is_color(color: str) -> None:
         raise me.ValidationError('Color must be a color.')
 
 class Outfit(me.EmbeddedDocument):
-    base = me.IntField(min_value=1, required=True, default=1)
+    base = me.IntField(min_value=1, max_value=1, required=True, default=1)
     base_color = me.StringField(
         validation=_is_color, required=True, default='663931')
-    shirt = me.IntField(min_value=1, required=True, default=1)
+    shirt = me.IntField(min_value=1, max_value=1, required=True, default=1)
     shirt_color = me.StringField(
         validation=_is_color, required=True, default='301270')
-    pants = me.IntField(min_value=1, required=True, default=1)
+    pants = me.IntField(min_value=1, max_value=1, required=True, default=1)
     pants_color = me.StringField(
         validation=_is_color, required=True, default='1c1c1c')
 
-    eyes = me.IntField(min_value=1, required=True, default=1)
-    mouth = me.IntField(min_value=1, required=True, default=1)
+    eyes = me.IntField(min_value=1, max_value=2, required=True, default=1)
+    mouth = me.IntField(min_value=1, max_value=2, required=True, default=1)
 
     def to_dict(self) -> dict:
         return dict(
@@ -37,6 +37,19 @@ class Outfit(me.EmbeddedDocument):
             pants_color=self.pants_color,
             eyes=self.eyes,
             mouth=self.mouth)
+
+    def update_from_dict(self, outfit) -> None:
+        fields = [
+            'base',
+            'base_color',
+            'shirt',
+            'shirt_color',
+            'pants',
+            'pants_color',
+            'eyes',
+            'mouth']
+        for field in fields:
+            setattr(self, field, outfit[field])
 
 
 class Location(me.EmbeddedDocument):

@@ -48,6 +48,23 @@ def get_player(_) -> flask.Response:
     return the_user.player.to_dict()
 
 
+@app.route('/update_outfit', methods=['POST'])
+@flask_utils.server_required
+def update_outfit(_) -> flask.Response:
+    data = flask.request.json
+    user_id = data['user_id']
+    outfit = data['outfit']
+
+    object_id = bson.objectid.ObjectId(user_id)
+    the_user = user.User.objects(id=object_id).first()
+    if not the_user:
+        raise error.SpbError(f'user {user_id} not found',
+                             404, grpc.StatusCode.NOT_FOUND)
+    the_user.player.outfit.update_from_dict(outfit)
+    the_user.save()
+    return the_user.player.outfit.to_dict()
+
+
 def main(_) -> None:
     from gevent import pywsgi
     from geventwebsocket.handler import WebSocketHandler

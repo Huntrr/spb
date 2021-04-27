@@ -1,4 +1,5 @@
 extends Node2D
+class_name Character
 
 var flip_h = false setget set_flip_h
 

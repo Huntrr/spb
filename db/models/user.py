@@ -64,7 +64,7 @@ class GuestUser(User):
     # Guest names do not have to be unique.
     guest_name = me.StringField(
         min_length=1, max_length=20, required=True,
-        regex='[A-z\d_]+')
+        regex=r'^[A-z\d_]+$')
 
     def get_name(self) -> str:
         return self.guest_name

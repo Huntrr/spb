@@ -30,9 +30,9 @@ __meta__ = {
 [node name="Popup" type="WindowDialog" parent="Control/CenterContainer"]
 visible = true
 margin_left = 362.0
-margin_top = 99.0
+margin_top = 100.0
 margin_right = 662.0
-margin_bottom = 499.0
+margin_bottom = 500.0
 rect_min_size = Vector2( 300, 400 )
 mouse_filter = 1
 custom_icons/close_highlight = ExtResource( 3 )
@@ -46,9 +46,18 @@ window_title = "CHARACTER EDITOR"
 position = Vector2( 150, 200 )
 scale = Vector2( 10, 10 )
 
-[node name="OutfitEditor" type="VBoxContainer" parent="Control/CenterContainer/Popup"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer/Popup"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="OutfitEditor" type="VBoxContainer" parent="Control/CenterContainer/Popup/VBoxContainer"]
+margin_right = 300.0
+margin_bottom = 370.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/separation = 25
@@ -58,26 +67,37 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Eyes" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
-margin_top = 75.0
-margin_bottom = 105.0
+[node name="Eyes" parent="Control/CenterContainer/Popup/VBoxContainer/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 60.0
+margin_bottom = 90.0
 
-[node name="Mouth" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
-margin_top = 130.0
-margin_bottom = 160.0
+[node name="Mouth" parent="Control/CenterContainer/Popup/VBoxContainer/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 115.0
+margin_bottom = 145.0
 
-[node name="Base" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
+[node name="Base" parent="Control/CenterContainer/Popup/VBoxContainer/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 170.0
+margin_bottom = 200.0
 colorable = true
 
-[node name="Shirt" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
-margin_top = 240.0
-margin_bottom = 270.0
+[node name="Shirt" parent="Control/CenterContainer/Popup/VBoxContainer/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 225.0
+margin_bottom = 255.0
 colorable = true
 
-[node name="Pants" parent="Control/CenterContainer/Popup/OutfitEditor" instance=ExtResource( 7 )]
-margin_top = 295.0
-margin_bottom = 325.0
+[node name="Pants" parent="Control/CenterContainer/Popup/VBoxContainer/OutfitEditor" instance=ExtResource( 7 )]
+margin_top = 280.0
+margin_bottom = 310.0
 colorable = true
+
+[node name="Save" type="Button" parent="Control/CenterContainer/Popup/VBoxContainer"]
+margin_left = 89.0
+margin_top = 374.0
+margin_right = 211.0
+margin_bottom = 400.0
+size_flags_horizontal = 4
+custom_fonts/font = ExtResource( 5 )
+text = "Update Outfit"
 
 [node name="ColorPicker" type="Panel" parent="Control/CenterContainer/Popup"]
 visible = false
@@ -94,10 +114,10 @@ __meta__ = {
 [node name="ColorPicker" type="ColorPicker" parent="Control/CenterContainer/Popup/ColorPicker"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 17.0
-margin_top = 17.0
-margin_right = 2.0
-margin_bottom = 2.0
+margin_left = 21.0
+margin_top = 21.0
+margin_right = 6.0
+margin_bottom = 6.0
 rect_clip_content = true
 edit_alpha = false
 presets_enabled = false

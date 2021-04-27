@@ -1,4 +1,5 @@
 extends Node
+class_name OverlayManager
 # Simple node that opens an overlay when a user triggers a multi-use station.
 # Set as the child to a KeyListener.
 
@@ -9,7 +10,7 @@ signal created_overlay(overlay, user)
 export(String, FILE) var overlay_path
 onready var overlay: PackedScene = load(overlay_path)
 
-onready var _object_tile = $"../"
+onready var object_tile = $"../../"
 
 var _overlay: Node
 var _local_user: Node
@@ -19,7 +20,7 @@ func _ready():
 	get_parent().connect("exited", self, "_on_exited")
 
 func _physics_process(_delta: float) -> void:
-	if _local_user and _local_user.using != _object_tile:
+	if _local_user and _local_user.using != object_tile:
 		_local_exit()
 
 func _on_triggered(node: Node) -> void:
@@ -30,7 +31,7 @@ func _on_triggered(node: Node) -> void:
 		add_child(_overlay)
 		emit_signal("created_overlay", _overlay, _local_user)
 	if node.is_current_player() or multiplayer.is_network_server():
-		node.use(_object_tile)
+		node.use(object_tile)
 
 func _on_exited(node: Node) -> void:
 	if _local_user == node:
@@ -60,5 +61,5 @@ master func _call_server_exit(node_path: NodePath) -> void:
 	
 master func _server_exit(node: Node) -> void:
 	# Server-side exit ship builder logic.
-	if node.using == _object_tile:
+	if node.using == object_tile:
 		node.stand()

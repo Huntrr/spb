@@ -4,8 +4,8 @@ signal updated(outfit)
 
 const outfits: Outfits = preload("res://data/character/outfits.tres")
 
-onready var color_picker_panel: Node = $"../ColorPicker"
-onready var color_picker: ColorPicker = $"../ColorPicker/ColorPicker"
+onready var color_picker_panel: Node = $"../../ColorPicker"
+onready var color_picker: ColorPicker = $"../../ColorPicker/ColorPicker"
 var coloring: String = ""
 
 var _outfit := {

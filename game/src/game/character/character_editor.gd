@@ -1,8 +1,11 @@
 extends Node
 
+signal set_outfit(outfit)
+
 onready var popup: WindowDialog = $Control/CenterContainer/Popup
-onready var outfit_editor: Node = $Control/CenterContainer/Popup/OutfitEditor
-onready var character: Node = $Control/CenterContainer/Popup/Character
+onready var outfit_editor: Node = $Control/CenterContainer/Popup/VBoxContainer/OutfitEditor
+onready var character: Character = $Control/CenterContainer/Popup/Character
+onready var save: Button = $Control/CenterContainer/Popup/VBoxContainer/Save
 
 func _ready():
 	popup.popup()
@@ -10,11 +13,15 @@ func _ready():
 	assert(popup.get_close_button().connect("pressed", self, "_close") == OK)
 	
 	assert(outfit_editor.connect("updated", self, "_on_updated") == OK)
+	assert(save.connect("pressed", self, "_on_save") == OK)
 
 func init(outfit: Dictionary):
 	character.set_outfit(outfit)
 	outfit_editor.init(outfit)
 	return self
+
+func _on_save() -> void:
+	emit_signal("set_outfit", character.get_outfit())
 
 func _on_updated(outfit: Dictionary) -> void:
 	character.set_outfit(outfit)
