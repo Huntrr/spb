@@ -4,11 +4,14 @@ Basic data model for an instantiated ship.
 import mongoengine as me
 
 
+BlueprintField = me.ListField(me.DictField())
+
+
 class Ship(me.Document):
     """Information about a given SPB ship/station."""
     meta = {'allow_inheritance': True}
 
-    blueprint = me.ListField(me.DictField())
+    blueprint = BlueprintField
 
     def to_dict(self) -> dict:
         return dict(blueprint=self.blueprint)
