@@ -22,6 +22,7 @@ func init(outfit: Dictionary):
 
 func _on_save() -> void:
 	emit_signal("set_outfit", character.get_outfit())
+	queue_free()
 
 func _on_updated(outfit: Dictionary) -> void:
 	character.set_outfit(outfit)
