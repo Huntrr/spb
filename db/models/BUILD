@@ -56,3 +56,14 @@ py_library(
         requirement("mongoengine"),
     ],
 )
+
+py_library(
+    name = "lobby",
+    srcs = ["lobby.py"],
+    deps = [
+        ":ship",
+        ":user",
+        "//auth:security",
+        requirement("mongoengine"),
+    ],
+)
