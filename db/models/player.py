@@ -9,20 +9,16 @@ from db.models import ship as _ship
 
 _COLOR_REGEXP = r'^[\da-f]{6}$'
 
-def _is_color(color: str) -> None:
-    if not re.match(_COLOR_REGEXP, color):
-        raise me.ValidationError('Color must be a color.')
-
 class Outfit(me.EmbeddedDocument):
     base = me.IntField(min_value=1, max_value=1, required=True, default=1)
     base_color = me.StringField(
-        validation=_is_color, required=True, default='663931')
+        regex=_COLOR_REGEXP, required=True, default='663931')
     shirt = me.IntField(min_value=1, max_value=1, required=True, default=1)
     shirt_color = me.StringField(
-        validation=_is_color, required=True, default='301270')
+        regex=_COLOR_REGEXP, required=True, default='301270')
     pants = me.IntField(min_value=1, max_value=1, required=True, default=1)
     pants_color = me.StringField(
-        validation=_is_color, required=True, default='1c1c1c')
+        regex=_COLOR_REGEXP, required=True, default='1c1c1c')
 
     eyes = me.IntField(min_value=1, max_value=2, required=True, default=1)
     mouth = me.IntField(min_value=1, max_value=2, required=True, default=1)
