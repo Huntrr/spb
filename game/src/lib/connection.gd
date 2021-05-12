@@ -13,6 +13,7 @@ const dict = {
 		"auth": "http://0.0.0.0:30202",
 		"gateway": "http://0.0.0.0:30201",
 		"universe": "http://0.0.0.0:30200",
+		"lobby": "http://0.0.0.0:30203",
 	}
 }
 const SESSION_PATH = "user://session.dat"

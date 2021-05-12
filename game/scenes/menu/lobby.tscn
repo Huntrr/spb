@@ -1,0 +1,489 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/ui/panel.tres" type="StyleBox" id=1]
+[ext_resource path="res://assets/ui/x_hover.png" type="Texture" id=2]
+[ext_resource path="res://assets/fonts/default.tres" type="DynamicFont" id=3]
+[ext_resource path="res://assets/ui/x.png" type="Texture" id=4]
+[ext_resource path="res://scenes/menu/game_list.tscn" type="PackedScene" id=5]
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends WindowDialog
+
+
+func _ready():
+	popup()
+"
+
+[node name="Lobby" type="WindowDialog"]
+visible = true
+anchor_left = 0.1
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.925
+margin_top = 0.752533
+margin_bottom = 0.752563
+custom_icons/close_highlight = ExtResource( 2 )
+custom_icons/close = ExtResource( 4 )
+custom_styles/panel = ExtResource( 1 )
+custom_fonts/title_font = ExtResource( 3 )
+custom_colors/title_color = Color( 1, 1, 1, 1 )
+popup_exclusive = true
+window_title = "Game Lobby"
+script = SubResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GameList" parent="." instance=ExtResource( 5 )]
+visible = false
+
+[node name="GameLobby" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="GameLobby"]
+margin_right = 819.0
+margin_bottom = 25.0
+custom_constants/margin_top = 5
+
+[node name="Label" type="Label" parent="GameLobby/MarginContainer"]
+margin_top = 5.0
+margin_right = 819.0
+margin_bottom = 25.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 10.0
+custom_fonts/font = ExtResource( 3 )
+text = "Fun Game"
+align = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="GameLobby"]
+margin_top = 35.0
+margin_right = 819.0
+margin_bottom = 59.0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="GameLobby/CenterContainer"]
+margin_left = 184.0
+margin_right = 634.0
+margin_bottom = 24.0
+
+[node name="MarginContainer" type="MarginContainer" parent="GameLobby/CenterContainer/HBoxContainer2"]
+margin_right = 149.0
+margin_bottom = 24.0
+custom_constants/margin_right = 50
+custom_constants/margin_left = 50
+
+[node name="Leave" type="Button" parent="GameLobby/CenterContainer/HBoxContainer2/MarginContainer"]
+margin_left = 50.0
+margin_right = 99.0
+margin_bottom = 24.0
+text = "Leave"
+
+[node name="Minutes" type="SpinBox" parent="GameLobby/CenterContainer/HBoxContainer2"]
+margin_left = 153.0
+margin_right = 227.0
+margin_bottom = 24.0
+max_value = 60.0
+value = 5.0
+align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Seconds" type="SpinBox" parent="GameLobby/CenterContainer/HBoxContainer2"]
+margin_left = 231.0
+margin_right = 305.0
+margin_bottom = 24.0
+max_value = 59.0
+step = 5.0
+rounded = true
+prefix = ":"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer2" type="MarginContainer" parent="GameLobby/CenterContainer/HBoxContainer2"]
+margin_left = 309.0
+margin_right = 450.0
+margin_bottom = 24.0
+custom_constants/margin_right = 50
+custom_constants/margin_left = 50
+
+[node name="Start" type="Button" parent="GameLobby/CenterContainer/HBoxContainer2/MarginContainer2"]
+margin_left = 50.0
+margin_right = 91.0
+margin_bottom = 24.0
+text = "Start"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="GameLobby"]
+margin_top = 69.0
+margin_right = 819.0
+margin_bottom = 495.0
+size_flags_vertical = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="GameLobby/ScrollContainer"]
+margin_right = 819.0
+margin_bottom = 250.0
+size_flags_horizontal = 3
+
+[node name="ItemList" type="GridContainer" parent="GameLobby/ScrollContainer/CenterContainer"]
+margin_left = 143.0
+margin_right = 676.0
+margin_bottom = 250.0
+size_flags_horizontal = 5
+size_flags_vertical = 3
+columns = 4
+
+[node name="PanelContainer" type="PanelContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList"]
+margin_right = 175.0
+margin_bottom = 250.0
+rect_min_size = Vector2( 175, 250 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 168.0
+margin_bottom = 243.0
+custom_constants/separation = 10
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer"]
+margin_right = 161.0
+margin_bottom = 14.0
+text = "Uncrewed"
+align = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 161.0
+margin_bottom = 236.0
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer"]
+margin_right = 161.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_right = 161.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_top = 3.0
+margin_right = 119.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Hunter"
+align = 1
+
+[node name="Kick" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_left = 123.0
+margin_right = 161.0
+margin_bottom = 20.0
+text = "Kick"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 161.0
+margin_bottom = 44.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer2"]
+margin_top = 3.0
+margin_right = 119.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Hunter"
+align = 1
+
+[node name="Kick" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 123.0
+margin_right = 161.0
+margin_bottom = 20.0
+text = "Kick"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 48.0
+margin_right = 161.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer3"]
+margin_top = 3.0
+margin_right = 119.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Hunter"
+align = 1
+
+[node name="Kick" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 123.0
+margin_right = 161.0
+margin_bottom = 20.0
+text = "Kick"
+
+[node name="PanelContainer2" type="PanelContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList"]
+margin_left = 179.0
+margin_right = 354.0
+margin_bottom = 250.0
+rect_min_size = Vector2( 175, 250 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 168.0
+margin_bottom = 243.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer"]
+margin_right = 161.0
+margin_bottom = 20.0
+custom_constants/separation = 5
+
+[node name="Button" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/HBoxContainer"]
+margin_right = 35.0
+margin_bottom = 20.0
+text = "Join"
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/HBoxContainer"]
+margin_left = 40.0
+margin_top = 3.0
+margin_right = 136.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Merry Pranksters"
+clip_text = true
+
+[node name="Button2" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/HBoxContainer"]
+margin_left = 141.0
+margin_right = 161.0
+margin_bottom = 20.0
+text = "X"
+
+[node name="PanelContainer" type="PanelContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer"]
+margin_top = 24.0
+margin_right = 161.0
+margin_bottom = 124.0
+rect_min_size = Vector2( 0, 100 )
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer"]
+margin_top = 128.0
+margin_right = 161.0
+margin_bottom = 148.0
+
+[node name="ColorRect" type="ColorRect" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/HBoxContainer2"]
+margin_right = 30.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 30, 0 )
+size_flags_horizontal = 3
+color = Color( 0.682353, 0.0980392, 0.0980392, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VScrollBar" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/HBoxContainer2"]
+margin_left = 34.0
+margin_right = 81.0
+margin_bottom = 20.0
+text = "Team"
+
+[node name="Button" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/HBoxContainer2"]
+margin_left = 85.0
+margin_right = 161.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+text = "Set Ship"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer"]
+margin_top = 152.0
+margin_right = 161.0
+margin_bottom = 236.0
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer"]
+margin_right = 149.0
+margin_bottom = 116.0
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_right = 149.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_top = 3.0
+margin_right = 125.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Hunter"
+
+[node name="X" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_left = 129.0
+margin_right = 149.0
+margin_bottom = 20.0
+text = "X"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 149.0
+margin_bottom = 44.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer2"]
+margin_top = 3.0
+margin_right = 125.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Hunter"
+
+[node name="X" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 129.0
+margin_right = 149.0
+margin_bottom = 20.0
+text = "X"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 48.0
+margin_right = 149.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer3"]
+margin_top = 3.0
+margin_right = 125.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Hunter"
+
+[node name="X" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 129.0
+margin_right = 149.0
+margin_bottom = 20.0
+text = "X"
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 72.0
+margin_right = 149.0
+margin_bottom = 92.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer4"]
+margin_top = 3.0
+margin_right = 125.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Hunter"
+
+[node name="X" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 129.0
+margin_right = 149.0
+margin_bottom = 20.0
+text = "X"
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 96.0
+margin_right = 149.0
+margin_bottom = 116.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer5"]
+margin_top = 3.0
+margin_right = 125.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Hunter"
+
+[node name="X" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/PanelContainer2/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer5"]
+margin_left = 129.0
+margin_right = 149.0
+margin_bottom = 20.0
+text = "X"
+
+[node name="MarginContainer" type="MarginContainer" parent="GameLobby/ScrollContainer/CenterContainer/ItemList"]
+margin_left = 358.0
+margin_right = 533.0
+margin_bottom = 250.0
+rect_min_size = Vector2( 175, 250 )
+custom_constants/margin_right = 20
+custom_constants/margin_top = 60
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 60
+
+[node name="Button" type="Button" parent="GameLobby/ScrollContainer/CenterContainer/ItemList/MarginContainer"]
+margin_left = 20.0
+margin_top = 60.0
+margin_right = 155.0
+margin_bottom = 190.0
+text = "New Crew"
+
+[node name="CreateDialog" type="AcceptDialog" parent="."]
+visible = true
+margin_right = 300.0
+margin_bottom = 96.0
+rect_min_size = Vector2( 300, 0 )
+window_title = "Create Game"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CreateDialog"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 292.0
+margin_bottom = 60.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit" type="LineEdit" parent="CreateDialog/VBoxContainer"]
+margin_right = 284.0
+margin_bottom = 24.0
+align = 1
+placeholder_text = "Name"
+
+[node name="LineEdit2" type="LineEdit" parent="CreateDialog/VBoxContainer"]
+margin_top = 28.0
+margin_right = 284.0
+margin_bottom = 52.0
+align = 1
+secret = true
+placeholder_text = "Password (optional)"
+
+[node name="JoinDialog" type="AcceptDialog" parent="."]
+margin_right = 300.0
+margin_bottom = 96.0
+rect_min_size = Vector2( 300, 0 )
+window_title = "Join Game"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="JoinDialog"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 292.0
+margin_bottom = 60.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit" type="LineEdit" parent="JoinDialog/VBoxContainer"]
+margin_right = 284.0
+margin_bottom = 24.0
+text = "Fun Game"
+align = 1
+editable = false
+placeholder_text = "Name"
+
+[node name="LineEdit2" type="LineEdit" parent="JoinDialog/VBoxContainer"]
+margin_top = 28.0
+margin_right = 284.0
+margin_bottom = 52.0
+align = 1
+secret = true
+placeholder_text = "Password"

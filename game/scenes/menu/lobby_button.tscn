@@ -1,0 +1,67 @@
+[gd_scene format=2]
+
+[node name="PanelContainer" type="PanelContainer"]
+margin_right = 811.0
+margin_bottom = 48.0
+mouse_default_cursor_shape = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 804.0
+margin_bottom = 41.0
+rect_min_size = Vector2( 0, 34 )
+mouse_default_cursor_shape = 2
+size_flags_horizontal = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Game" type="Label" parent="HBoxContainer"]
+margin_top = 10.0
+margin_right = 433.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 25.0
+text = "Fun Game"
+align = 1
+
+[node name="Host" type="Label" parent="HBoxContainer"]
+margin_left = 437.0
+margin_top = 10.0
+margin_right = 611.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 10.0
+text = "hunter"
+align = 1
+
+[node name="Players" type="Label" parent="HBoxContainer"]
+margin_left = 615.0
+margin_top = 10.0
+margin_right = 684.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 4.0
+text = "6"
+align = 1
+
+[node name="Time" type="Label" parent="HBoxContainer"]
+margin_left = 688.0
+margin_top = 10.0
+margin_right = 758.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 4.0
+text = "5:00"
+align = 1
+
+[node name="PW\?" type="Label" parent="HBoxContainer"]
+margin_left = 762.0
+margin_top = 10.0
+margin_right = 797.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "X"
+align = 1
