@@ -66,20 +66,25 @@ class GuestUser(User):
         min_length=1, max_length=20, required=True,
         regex=r'^[A-z\d_]+$')
 
-    def get_name(self) -> str:
-        return self.guest_name
+    def get_display_name(self) -> str:
+        return f'{self.guest_name} (#{self.guest_id})'
+
+    def to_dict(self) -> dict:
+        """Returns client-friendly dictionary representation of the user."""
+        return dict(
+            id=str(self.id),
+            guest_id=self.guest_id,
+            display_name=self.get_display_name(),
+        )
+
 
     def get_jwt(self) -> str:
         """Returns a JWT authenticating as this user."""
         self.last_login = datetime.utcnow()
         self.save()
 
-        user = dict(
-            type='player',
-            id=str(self.id),
-            guest_id=self.guest_id,
-            name=self.get_name(),
-        )
+        user = self.to_dict()
+        user['type'] = 'player'
         return jwt_context.encode(user, _JWT_EXPIRE_TIME)
 
 
@@ -92,7 +97,7 @@ class NonGuestUser(User):
         required=True, unique=True,
         sparse=True, regex=r'^[A-z\d_]+$')
 
-    def get_name(self) -> str:
+    def get_display_name(self) -> str:
         return self.user_name
 
 
@@ -137,6 +142,13 @@ class EmailUser(NonGuestUser):
         self.email_date_verified = datetime.utcnow()
         self.email_verification_code = None
 
+    def to_dict(self) -> dict:
+        """Returns client-friendly dictionary representation of the user."""
+        return dict(
+            id=str(self.id),
+            user_id=self.user_id,
+            display_name=self.get_display_name())
+
     def get_jwt(self, password: str) -> str:
         """Returns a JWT authenticating as this user."""
         if not self.password_matches(password):
@@ -152,10 +164,7 @@ class EmailUser(NonGuestUser):
         self.last_login = datetime.utcnow()
         self.save()
 
-        user = dict(
-            type='player',
-            id=str(self.id),
-            user_id=self.user_id,
-            email=self.email,
-            name=self.get_name())
+        user = self.to_dict()
+        user['type'] = 'player'
+        user['email'] = self.email
         return jwt_context.encode(user, _JWT_EXPIRE_TIME)

@@ -61,7 +61,7 @@ master func introduce_player(jwt: String) -> void:
 		$"../".rpc_id(sender_id, "kick")
 		return
 	
-	Log.info("Got player %s" % user.name)
+	Log.info("Got player %s" % user.display_name)
 	
 	# TODO(hunter): Include the JWT to verify this user is themself!
 	var data_status: StatusOr = yield(Connection.request(
@@ -83,9 +83,7 @@ master func introduce_player(jwt: String) -> void:
 	rpc_id(sender_id, "set_blueprint", _cells)
 	$Ship.introduce_player(sender_id)
 	
-	var display_name: String = user.name
-	if "guest_id" in user:
-		display_name += ' (#%s)' % user.guest_id
+	var display_name: String = user.display_name
 	$Ship.spawn_player(sender_id, {
 		'display_name': display_name,
 		'id': user.id,
