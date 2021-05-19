@@ -64,6 +64,8 @@ py_library(
         ":ship",
         ":user",
         "//auth:security",
+        "//util:error",
         requirement("mongoengine"),
+        requirement("grpcio"),
     ],
 )

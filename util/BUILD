@@ -10,3 +10,14 @@ py_library(
         requirement("grpcio"),
     ],
 )
+
+py_library(
+    name = "mongo",
+    srcs = ["mongo.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":error",
+        requirement("grpcio"),
+        requirement("mongoengine"),
+    ],
+)

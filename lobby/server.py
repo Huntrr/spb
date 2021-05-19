@@ -3,14 +3,15 @@ Launcher for lobby server.
 """
 from absl import app as base_app
 from absl import flags, logging
-import bson
 import flask
 import grpc
 
 from db import connect
 from db.models import lobby
+from db.models import user
 from lib import flask_utils
 from util import error
+from util import mongo
 
 flags.DEFINE_integer('port', 30203, 'Port to use for the lobby server.')
 
@@ -40,11 +41,7 @@ def get_game(_) -> flask.Response:
     data = flask.request.json
     lobby_id = data['lobby_id']
 
-    object_id = bson.objectid.ObjectId(lobby_id)
-    the_lobby = lobby.Lobby.objects(id=object_id).first()
-    if not the_lobby:
-        raise error.SpbError(f'lobby {lobby_id} not found',
-                             404, grpc.StatusCode.NOT_FOUND)
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
     return the_lobby.to_dict()
 
 @app.route('/join_game', methods=['POST'])
@@ -54,7 +51,13 @@ def join_game(_) -> flask.Response:
     user_id = data['user_id']
     lobby_id = data['lobby_id']
     maybe_password = data.get('password')
-    # TODO(hunter): Join Game.
+
+    the_user = mongo.get_object(user.User, user_id)
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+
+    the_lobby.add_user(the_user, maybe_password)
+
+    return the_lobby.to_dict()
 
 @app.route('/create_game', methods=['POST'])
 @flask_utils.server_required
@@ -63,15 +66,27 @@ def create_game(_) -> flask.Response:
     user_id = data['user_id']
     lobby_name = data['lobby_name']
     password = data['password']
-    # TODO(hunter): Create Game.
+
+    the_user = mongo.get_object(user.User, user_id)
+    the_lobby = lobby.Lobby(name=lobby_name, host=the_user)
+    if password:
+        the_lobby.set_password(password)
+    the_lobby.save()
+
+    the_lobby.add_user(the_user, password)
+
+    return the_lobby.to_dict()
 
 @app.route('/leave_game', methods=['POST'])
 @flask_utils.server_required
 def leave_game(_) -> flask.Response:
     data = flask.request.json
     user_id = data['user_id']
-    lobby_id = data['lobby_id']
-    # TODO(hunter): Leave Game.
+
+    the_user = mongo.get_object(user.User, user_id)
+    the_lobby = the_user.current_lobby
+    the_lobby.remove_user(the_user)
+    return the_lobby.to_dict()
 
 @app.route('/kick_user', methods=['POST'])
 @flask_utils.server_required
@@ -79,7 +94,11 @@ def kick_user(_) -> flask.Response:
     data = flask.request.json
     user_id = data['user_id']
     lobby_id = data['lobby_id']
-    # TODO(hunter): Kick User.
+
+    the_user = mongo.get_object(user.User, user_id)
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+    the_lobby.remove_user(the_user)
+    return the_lobby.to_dict()
 
 @app.route('/join_crew', methods=['POST'])
 @flask_utils.server_required
@@ -88,7 +107,13 @@ def join_crew(_) -> flask.Response:
     user_id = data['user_id']
     lobby_id = data['lobby_id']
     crew_id = data['crew_id']
-    # TODO(hunter): Join crew.
+
+    the_user = mongo.get_object(user.User, user_id)
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+
+    the_lobby.add_to_crew(the_user, crew_id)
+    the_lobby.save()
+    return the_lobby.to_dict()
 
 @app.route('/exit_crew', methods=['POST'])
 @flask_utils.server_required
@@ -96,16 +121,25 @@ def exit_crew(_) -> flask.Response:
     data = flask.request.json
     user_id = data['user_id']
     lobby_id = data['lobby_id']
-    crew_id = data['crew_id']
-    # TODO(hunter): Exit crew.
+
+    the_user = mongo.get_object(user.User, user_id)
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+
+    the_lobby.remove_from_crews(the_user)
+    the_lobby.save()
+    return the_lobby.to_dict()
 
 @app.route('/new_crew', methods=['POST'])
 @flask_utils.server_required
-def join_crew(_) -> flask.Response:
+def new_crew(_) -> flask.Response:
     data = flask.request.json
     lobby_id = data['lobby_id']
     crew_name = data['crew_name']
-    # TODO(hunter): New crew.
+
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+    the_lobby.new_crew(crew_name)
+    the_lobby.save()
+    return the_lobby.to_dict()
 
 @app.route('/delete_crew', methods=['POST'])
 @flask_utils.server_required
@@ -113,7 +147,11 @@ def delete_crew(_) -> flask.Response:
     data = flask.request.json
     lobby_id = data['lobby_id']
     crew_id = data['crew_id']
-    # TODO(hunter): Delete crew.
+
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+    the_lobby.delete_crew(crew_id)
+    the_lobby.save()
+    return the_lobby.to_dict()
 
 @app.route('/set_team', methods=['POST'])
 @flask_utils.server_required
@@ -122,7 +160,15 @@ def set_team(_) -> flask.Response:
     lobby_id = data['lobby_id']
     crew_id = data['crew_id']
     team = data['team']
-    # TODO(hunter): Set team.
+
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+    the_crew = the_lobby.get_crew(crew_id)
+    if the_crew is None:
+        raise error.SpbError(f'Crew {crew_id} not found.',
+                             404, grpc.StatusCode.NOT_FOUND)
+    the_crew.team = team
+    the_lobby.save()
+    return the_lobby.to_dict()
 
 @app.route('/set_ship', methods=['POST'])
 @flask_utils.server_required
@@ -131,7 +177,15 @@ def set_ship(_) -> flask.Response:
     lobby_id = data['lobby_id']
     crew_id = data['crew_id']
     blueprint = data['blueprint']
-    # TODO(hunter): Set ship.
+
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+    the_crew = the_lobby.get_crew(crew_id)
+    if the_crew is None:
+        raise error.SpbError(f'Crew {crew_id} not found.',
+                             404, grpc.StatusCode.NOT_FOUND)
+    the_crew.blueprint = blueprint
+    the_lobby.save()
+    return the_lobby.to_dict()
 
 @app.route('/set_time_limit', methods=['POST'])
 @flask_utils.server_required
@@ -139,7 +193,10 @@ def set_time_limit(_) -> flask.Response:
     data = flask.request.json
     lobby_id = data['lobby_id']
     time_limit = data['time_limit']
-    # TODO(hunter): Set time_limit.
+
+    the_lobby = mongo.get_object(lobby.Lobby, lobby_id)
+    the_lobby.time_limit = time_limit
+    return the_lobby.to_dict()
 
 
 def main(_) -> None:

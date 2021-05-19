@@ -25,6 +25,9 @@ class User(me.Document):
     # Game data for this user.
     player = me.EmbeddedDocumentField(player.Player, default=player.Player)
 
+    # Lobby this user is in.
+    current_lobby = me.ReferenceField('Lobby')
+
     def touch(self) -> None:
         """Update the last_active field on this user."""
         self.last_active = datetime.utcnow()
