@@ -62,6 +62,16 @@ class Lobby(me.Document):
                 return crew
         return None
 
+    def new_crew(self, crew_name: str) -> None:
+        self.crews.append(Crew(name=crew_name))
+
+    def delete_crew(self, crew_id: str) -> None:
+        the_crew = self.get_crew(crew_id)
+        if the_crew is None:
+            raise error.SpbError(f'Crew {crew_id} not found.',
+                                 404, grpc.StatusCode.NOT_FOUND)
+        self.crews.remove(crew_id)
+
     def remove_from_crews(self, the_user: user.User) -> None:
         assert the_user.current_lobby == self
 

@@ -228,11 +228,7 @@ script/source = "extends LineEdit
 
 func _ready():
 	if Connection.logged_in():
-		if \"guest_id\" in Connection.session_user:
-			set_text(\"guest%d: \\\"%s\\\"\" % [
-				Connection.session_user.guest_id, Connection.session_user.name])
-		else:
-			set_text(Connection.session_user.name)
+		set_text(Connection.session_user.display_name)
 	else:
 		set_text(\"NOT LOGGED IN\")
 "

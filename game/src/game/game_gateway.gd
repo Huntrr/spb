@@ -19,7 +19,7 @@ func _ready() -> void:
 		return
 	
 	var data: Dictionary = data_status.value
-	Log.info("Logged in as: %s" % data.name)
+	Log.info("Logged in as: %s" % data.display_name)
 	
 	assert(_inside_wrapper.multiplayer.connect(
 		"connection_failed", self, "_on_inside_connection_failed") == OK)

@@ -40,7 +40,7 @@ def get_news() -> flask.Response:
 @flask_utils.user_required
 def identity(the_user: user.User) -> flask.Response:
     """Returns the name of the currently authenticated user."""
-    return dict(name=the_user.get_name())
+    return dict(display_name=the_user.get_display_name())
 
 
 @app.route('/identity_server', methods=['GET'])
@@ -71,7 +71,7 @@ def login_guest() -> flask.Response:
         raise error.SpbError('Unable to register a new guest account')
 
     logging.info('Created a new guest user %s (gid: %d)',
-                 the_user.get_name(), the_user.guest_id)
+                 the_user.get_display_name(), the_user.guest_id)
     return dict(jwt=the_user.get_jwt())
 
 
@@ -139,7 +139,7 @@ def register_spb() -> flask.Response:
         'verify_spb', user_id=the_user.id, verification_code=verification_code,
         _external=True)
     email_utils.send_verification_email(
-        the_user.email, the_user.get_name(), verification_link)
+        the_user.email, the_user.get_display_name(), verification_link)
 
     logging.info('Created a new email user %s (uid: %d)',
                  the_user.email, the_user.user_id)
