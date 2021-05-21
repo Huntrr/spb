@@ -12,7 +12,7 @@ func _ready():
 		if not status.ok():
 			Log.error("Error %d: %s" % [status.code, status.message])
 			return
-		SceneManager.goto("res://scenes/server.tscn")
+		SceneManager.goto(SceneManager.SERVER_SCENE)
 	else:
 		Log.info("Starting SPB client")
 		_splash.hide()
@@ -21,4 +21,4 @@ func _ready():
 		yield(get_tree().create_timer(2.0), "timeout")
 		_splash.hide()
 		yield(get_tree().create_timer(0.5), "timeout")
-		SceneManager.goto("res://scenes/menu/login.tscn")
+		SceneManager.goto(SceneManager.LOGIN_SCENE)

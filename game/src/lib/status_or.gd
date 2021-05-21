@@ -22,3 +22,12 @@ func from_value(value_) -> StatusOr:
 
 func ok() -> bool:
 	return self.status.ok()
+
+func value_or_die(fatal: bool = false):
+	if self.ok():
+		return value
+	if fatal:
+		Dialog.show_fatal(status)
+	else:
+		Dialog.show_error(status)
+		push_error(status.message)

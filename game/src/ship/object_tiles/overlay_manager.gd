@@ -16,8 +16,8 @@ var _overlay: Node
 var _local_user: Node
 
 func _ready():
-	get_parent().connect("triggered", self, "_on_triggered")
-	get_parent().connect("exited", self, "_on_exited")
+	assert(get_parent().connect("triggered", self, "_on_triggered") == OK)
+	assert(get_parent().connect("exited", self, "_on_exited") == OK)
 
 func _physics_process(_delta: float) -> void:
 	if _local_user and _local_user.using != object_tile:
@@ -27,7 +27,7 @@ func _on_triggered(node: Node) -> void:
 	if node.is_current_player() and node != _local_user:
 		_local_user = node
 		_overlay = overlay.instance()
-		_overlay.connect("tree_exited", self, "_on_exited", [node])
+		assert(_overlay.connect("tree_exited", self, "_on_exited", [node]) == OK)
 		add_child(_overlay)
 		emit_signal("created_overlay", _overlay, _local_user)
 	if node.is_current_player() or multiplayer.is_network_server():

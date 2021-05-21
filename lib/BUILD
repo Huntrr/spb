@@ -16,6 +16,7 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         "//db/models:user",
+        "//db/models:server_auth",
         "//util:error",
         requirement("absl-py"),
         requirement("Flask"),

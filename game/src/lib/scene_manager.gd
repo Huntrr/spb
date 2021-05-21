@@ -1,5 +1,8 @@
 extends Node
 
+const LOGIN_SCENE = "res://scenes/menu/login.tscn"
+const SERVER_SCENE = "res://scenes/server.tscn"
+
 onready var root: Node = get_tree().get_root()
 onready var current_scene: Node = root.get_child(root.get_child_count() - 1)
 

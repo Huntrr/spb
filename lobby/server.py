@@ -25,7 +25,7 @@ app = flask.Flask(__name__)
 @flask_utils.user_required
 def list_games(_) -> flask.Response:
     data = flask.request.json
-    page = data.get('offset', 0)
+    offset = data.get('offset', 0)
 
     start_idx = offset
     end_idx = offset + LOBBIES_PER_PAGE

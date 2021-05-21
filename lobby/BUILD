@@ -13,6 +13,7 @@ py_binary(
         "//util:mongo",
         requirement("absl-py"),
         requirement("Flask"),
+        requirement("Flask-Sockets"),
         requirement("grpcio"),
     ],
 )

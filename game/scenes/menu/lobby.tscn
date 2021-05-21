@@ -1,12 +1,58 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://assets/ui/panel.tres" type="StyleBox" id=1]
 [ext_resource path="res://assets/ui/x_hover.png" type="Texture" id=2]
 [ext_resource path="res://assets/fonts/default.tres" type="DynamicFont" id=3]
 [ext_resource path="res://assets/ui/x.png" type="Texture" id=4]
-[ext_resource path="res://scenes/menu/game_list.tscn" type="PackedScene" id=5]
 [ext_resource path="res://src/menu/lobby.gd" type="Script" id=6]
-[ext_resource path="res://scenes/menu/game_lobby.tscn" type="PackedScene" id=7]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends AcceptDialog
+
+signal create_game(game_name, password)
+
+func _ready():
+	register_text_enter($VBoxContainer/Name)
+	register_text_enter($VBoxContainer/Password)
+	assert(connect(\"confirmed\", self, \"_on_confirmed\") == OK)
+
+func _on_confirmed() -> void:
+	emit_signal(\"create_game\",
+		$VBoxContainer/Name.text, $VBoxContainer/Password.text)
+"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends AcceptDialog
+
+signal create_crew(crew_name)
+
+func _ready():
+	register_text_enter($VBoxContainer/Name)
+	assert(connect(\"confirmed\", self, \"_on_confirmed\") == OK)
+
+func _on_confirmed() -> void:
+	emit_signal(\"create_crew\", $VBoxContainer/Name.text)
+"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends AcceptDialog
+
+signal join_game(game_id, password)
+
+var _game_id: String
+
+func _ready() -> void:
+	register_text_enter($VBoxContainer/Password)
+	assert(connect(\"confirmed\", self, \"_on_confirmed\") == OK)
+
+func popup_with(game_id: String, game_name: String) -> void:
+	$VBoxContainer/Name.text = game_name
+	_game_id = game_id
+	popup_centered()
+
+func _on_confirmed() -> void:
+	emit_signal(\"join_game\", _game_id, $VBoxContainer/Password.text)
+"
 
 [node name="Lobby" type="WindowDialog"]
 anchor_left = 0.1
@@ -20,24 +66,19 @@ custom_icons/close = ExtResource( 4 )
 custom_styles/panel = ExtResource( 1 )
 custom_fonts/title_font = ExtResource( 3 )
 custom_colors/title_color = Color( 1, 1, 1, 1 )
-popup_exclusive = true
 window_title = "Game Lobby"
 script = ExtResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="GameList" parent="." instance=ExtResource( 5 )]
-visible = false
-
-[node name="GameLobby" parent="." instance=ExtResource( 7 )]
-visible = false
-
 [node name="CreateDialog" type="AcceptDialog" parent="."]
 margin_right = 300.0
 margin_bottom = 96.0
 rect_min_size = Vector2( 300, 0 )
+popup_exclusive = true
 window_title = "Create Game"
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -51,13 +92,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="CreateDialog/VBoxContainer"]
+[node name="Name" type="LineEdit" parent="CreateDialog/VBoxContainer"]
 margin_right = 284.0
 margin_bottom = 24.0
 align = 1
 placeholder_text = "Name"
 
-[node name="LineEdit2" type="LineEdit" parent="CreateDialog/VBoxContainer"]
+[node name="Password" type="LineEdit" parent="CreateDialog/VBoxContainer"]
 margin_top = 28.0
 margin_right = 284.0
 margin_bottom = 52.0
@@ -69,7 +110,9 @@ placeholder_text = "Password (optional)"
 margin_right = 300.0
 margin_bottom = 69.0
 rect_min_size = Vector2( 300, 0 )
+popup_exclusive = true
 window_title = "New Crew"
+script = SubResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -83,7 +126,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="CreateCrew/VBoxContainer"]
+[node name="Name" type="LineEdit" parent="CreateCrew/VBoxContainer"]
 margin_right = 284.0
 margin_bottom = 24.0
 align = 1
@@ -93,7 +136,9 @@ placeholder_text = "Name"
 margin_right = 300.0
 margin_bottom = 96.0
 rect_min_size = Vector2( 300, 0 )
+popup_exclusive = true
 window_title = "Join Game"
+script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -107,18 +152,19 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="JoinDialog/VBoxContainer"]
+[node name="Name" type="LineEdit" parent="JoinDialog/VBoxContainer"]
 margin_right = 284.0
 margin_bottom = 24.0
-text = "Fun Game"
+text = "Name"
 align = 1
 editable = false
 placeholder_text = "Name"
 
-[node name="LineEdit2" type="LineEdit" parent="JoinDialog/VBoxContainer"]
+[node name="Password" type="LineEdit" parent="JoinDialog/VBoxContainer"]
 margin_top = 28.0
 margin_right = 284.0
 margin_bottom = 52.0
+text = "Password"
 align = 1
 secret = true
 placeholder_text = "Password"

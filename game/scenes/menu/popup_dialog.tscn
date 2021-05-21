@@ -5,32 +5,30 @@
 [ext_resource path="res://assets/fonts/body.tres" type="DynamicFont" id=3]
 
 [sub_resource type="GDScript" id=1]
-script/source = "extends WindowDialog
+script/source = "extends CanvasLayer
 
+onready var dialog: WindowDialog = $Dialog
 
 func _ready() -> void:
 	assert(
-		$MarginContainer/VBoxContainer/Button.connect(
-			\"button_up\", self, \"hide\") == OK)
-	
-	assert(connect(\"popup_hide\", self, \"_on_hide\") == OK)
-
-
-func _process(_delta) -> void:
-	get_parent().move_child(self, get_parent().get_child_count())
-
+		$Dialog/MarginContainer/VBoxContainer/Button.connect(
+			\"button_up\", dialog, \"hide\") == OK)
+	assert(dialog.connect(\"popup_hide\", self, \"_on_hide\") == OK)
 
 func show_popup(header: String, message: String) -> void:
-	window_title = header
-	$MarginContainer/VBoxContainer/Label.text = message
-	
-	popup()
+	dialog.window_title = header
+	$Dialog/MarginContainer/VBoxContainer/Label.text = message
+	dialog.popup()
 
 func _on_hide() -> void:
 	queue_free()
 "
 
-[node name="Dialog" type="WindowDialog"]
+[node name="CanvasLayer" type="CanvasLayer"]
+layer = 128
+script = SubResource( 1 )
+
+[node name="Dialog" type="WindowDialog" parent="."]
 anchor_left = 0.35
 anchor_top = 0.4
 anchor_right = 0.65
@@ -38,12 +36,11 @@ anchor_bottom = 0.65
 custom_fonts/title_font = ExtResource( 1 )
 popup_exclusive = true
 window_title = "Error!"
-script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="Dialog"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_constants/margin_right = 10
@@ -54,7 +51,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Dialog/MarginContainer"]
 margin_left = 10.0
 margin_top = 10.0
 margin_right = 297.0
@@ -63,7 +60,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="Dialog/MarginContainer/VBoxContainer"]
 margin_right = 287.0
 margin_bottom = 86.0
 size_flags_vertical = 3
@@ -73,7 +70,7 @@ align = 1
 valign = 1
 autowrap = true
 
-[node name="Button" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="Button" type="Button" parent="Dialog/MarginContainer/VBoxContainer"]
 margin_top = 90.0
 margin_right = 287.0
 margin_bottom = 130.0

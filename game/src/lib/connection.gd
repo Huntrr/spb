@@ -94,7 +94,6 @@ func ws_connect(service: String, uri: String) -> StatusOr:
 	
 	return StatusOr.new().from_value(client)
 
-
 func request(
 		service: String, uri: String, method: int, body: Dictionary) -> StatusOr:
 	var full_uri: String = "%s/%s" % [addresses()[service], uri]

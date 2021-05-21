@@ -1,9 +1,15 @@
-[gd_scene format=2]
+[gd_scene load_steps=2 format=2]
 
-[node name="PanelContainer" type="PanelContainer"]
+[ext_resource path="res://src/menu/lobby_button.gd" type="Script" id=1]
+
+[node name="LobbyButton" type="PanelContainer"]
 margin_right = 811.0
 margin_bottom = 48.0
 mouse_default_cursor_shape = 2
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 margin_left = 7.0
@@ -17,7 +23,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Game" type="Label" parent="HBoxContainer"]
+[node name="GameName" type="Label" parent="HBoxContainer"]
 margin_top = 10.0
 margin_right = 433.0
 margin_bottom = 24.0
@@ -36,7 +42,7 @@ size_flags_stretch_ratio = 10.0
 text = "hunter"
 align = 1
 
-[node name="Players" type="Label" parent="HBoxContainer"]
+[node name="PlayerCount" type="Label" parent="HBoxContainer"]
 margin_left = 615.0
 margin_top = 10.0
 margin_right = 684.0
@@ -56,7 +62,7 @@ size_flags_stretch_ratio = 4.0
 text = "5:00"
 align = 1
 
-[node name="PW\?" type="Label" parent="HBoxContainer"]
+[node name="PW" type="Label" parent="HBoxContainer"]
 margin_left = 762.0
 margin_top = 10.0
 margin_right = 797.0
