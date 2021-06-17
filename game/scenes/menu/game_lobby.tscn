@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://assets/fonts/default.tres" type="DynamicFont" id=1]
+[ext_resource path="res://src/menu/game_lobby.gd" type="Script" id=2]
 
 [node name="GameLobby" type="VBoxContainer"]
 anchor_right = 1.0
@@ -8,18 +9,19 @@ anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/separation = 10
+script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-margin_right = 819.0
+margin_right = 1024.0
 margin_bottom = 25.0
 custom_constants/margin_top = 5
 
 [node name="Label" type="Label" parent="MarginContainer"]
 margin_top = 5.0
-margin_right = 819.0
+margin_right = 1024.0
 margin_bottom = 25.0
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 10.0
@@ -29,12 +31,12 @@ align = 1
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 margin_top = 35.0
-margin_right = 819.0
+margin_right = 1024.0
 margin_bottom = 59.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="CenterContainer"]
-margin_left = 184.0
-margin_right = 634.0
+margin_left = 287.0
+margin_right = 737.0
 margin_bottom = 24.0
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/HBoxContainer2"]
@@ -87,18 +89,18 @@ text = "Start"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 margin_top = 69.0
-margin_right = 819.0
-margin_bottom = 495.0
+margin_right = 1024.0
+margin_bottom = 600.0
 size_flags_vertical = 3
 
 [node name="CenterContainer" type="CenterContainer" parent="ScrollContainer"]
-margin_right = 819.0
+margin_right = 1024.0
 margin_bottom = 250.0
 size_flags_horizontal = 3
 
 [node name="ItemList" type="GridContainer" parent="ScrollContainer/CenterContainer"]
-margin_left = 143.0
-margin_right = 676.0
+margin_left = 245.0
+margin_right = 778.0
 margin_bottom = 250.0
 size_flags_horizontal = 5
 size_flags_vertical = 3

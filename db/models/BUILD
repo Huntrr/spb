@@ -32,6 +32,7 @@ py_library(
     name = "user",
     srcs = ["user.py"],
     deps = [
+        ":lobby",
         ":player",
         "//auth:security",
         "//auth:jwt_context",
@@ -62,7 +63,6 @@ py_library(
     srcs = ["lobby.py"],
     deps = [
         ":ship",
-        ":user",
         "//auth:security",
         "//util:error",
         requirement("mongoengine"),

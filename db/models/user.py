@@ -9,6 +9,7 @@ import jwt
 import mongoengine as me
 
 from auth import jwt_context, security
+from db.models import lobby
 from db.models import player
 from util import error
 
@@ -26,7 +27,7 @@ class User(me.Document):
     player = me.EmbeddedDocumentField(player.Player, default=player.Player)
 
     # Lobby this user is in.
-    current_lobby = me.ReferenceField('Lobby')
+    current_lobby = me.ReferenceField(lobby.Lobby)
 
     def touch(self) -> None:
         """Update the last_active field on this user."""

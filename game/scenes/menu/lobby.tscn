@@ -47,8 +47,10 @@ func _ready() -> void:
 
 func popup_with(game_id: String, game_name: String) -> void:
 	$VBoxContainer/Name.text = game_name
+	$VBoxContainer/Password.text = \"\"
 	_game_id = game_id
 	popup_centered()
+	$VBoxContainer/Password.grab_focus()
 
 func _on_confirmed() -> void:
 	emit_signal(\"join_game\", _game_id, $VBoxContainer/Password.text)
