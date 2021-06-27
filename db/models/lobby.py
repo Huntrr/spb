@@ -49,6 +49,7 @@ class Lobby(me.Document):
     host = me.ReferenceField('User', required=True)
     password_hash = me.StringField(max_length=256)
 
+    n_users = me.IntField(min_value=0, required=True, default=0)
     uncrewed_users = me.ListField(me.ReferenceField('User'))
 
     crews = me.EmbeddedDocumentListField(Crew)
@@ -103,6 +104,7 @@ class Lobby(me.Document):
                                  401, grpc.StatusCode.PERMISSION_DENIED)
         the_user.current_lobby = self
         self.uncrewed_users.append(the_user)
+        self.n_users += 1
         self.save()
         the_user.save()
 
@@ -111,11 +113,12 @@ class Lobby(me.Document):
             raise error.SpbError(f'User {the_user.id} is not in this lobby',
                                  400, grpc.StatusCode.FAILED_PRECONDITION)
 
-        the_user.current_lobby = None
         self.remove_from_crews(the_user)
         self.uncrewed_users.remove(the_user)
+        the_user.current_lobby = None
 
         # TODO(hunter): Special case when the host is removed.
+        self.n_users -= 1
         self.save()
         the_user.save()
 

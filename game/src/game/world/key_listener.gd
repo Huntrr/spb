@@ -48,7 +48,7 @@ func _on_body_entered(node: Node) -> void:
 		_triggerer = node
 
 func _on_body_exited(node: Node) -> void:
-	if node.is_in_group(_triggerer_group) and node.is_current_player():
+	if node.is_in_group(_triggerer_group):
 		if node.is_current_player() or multiplayer.is_network_server():
 			emit_signal("exited", node)
 			_triggerer = null

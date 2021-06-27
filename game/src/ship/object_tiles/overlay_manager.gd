@@ -6,6 +6,8 @@ class_name OverlayManager
 onready var Log := Logger.new(self)
 
 signal created_overlay(overlay, user)
+signal user_start_using(user)
+signal user_stop_using(user)
 
 export(String, FILE) var overlay_path
 onready var overlay: PackedScene = load(overlay_path)
@@ -32,6 +34,8 @@ func _on_triggered(node: Node) -> void:
 		emit_signal("created_overlay", _overlay, _local_user)
 	if node.is_current_player() or multiplayer.is_network_server():
 		node.use(object_tile)
+		if multiplayer.is_network_server():
+			emit_signal("user_start_using", node)
 
 func _on_exited(node: Node) -> void:
 	if _local_user == node:
@@ -62,4 +66,5 @@ master func _call_server_exit(node_path: NodePath) -> void:
 master func _server_exit(node: Node) -> void:
 	# Server-side exit ship builder logic.
 	if node.using == object_tile:
+		emit_signal("user_stop_using", node)
 		node.stand()

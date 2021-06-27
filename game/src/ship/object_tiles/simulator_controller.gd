@@ -4,6 +4,10 @@ var _lobby: Node
 
 func _ready():
 	connect("created_overlay", self, "_on_created_overlay")
+	
+	if multiplayer.is_network_server():
+		assert(connect("user_start_using", self, "_server_leave_game") == OK)
+		assert(connect("user_stop_using", self, "_server_leave_game") == OK)
 
 func _on_created_overlay(overlay: Node, user: Player) -> void:
 	_lobby = overlay
@@ -21,9 +25,19 @@ puppet func _user_join_game(game_id: String) -> void:
 func _on_create_game(game_name: String, password: String, user: Player) -> void:
 	rpc("_create_game", get_path_to(user), game_name, password)
 
-
 func _on_join_game(game_id: String, password: String, user: Player) -> void:
 	rpc("_join_game", get_path_to(user), game_id, password)
+
+func _server_leave_game(user: Player) -> void:
+	var result = yield(Connection.request(
+		"lobby", "leave_game", HTTPClient.METHOD_POST, {
+			"user_id": user.info.id,
+		}), "completed")
+	if not result.ok():
+		rpc_id(
+			user.peer_id, "_show_error",
+			result.status.code, result.status.message)
+		return
 
 master func _create_game(
 		user_path: NodePath, game_name: String, password: String) -> void:
@@ -31,6 +45,9 @@ master func _create_game(
 	if user.peer_id != multiplayer.get_rpc_sender_id():
 		Log.error("Peer %d tried to act as %d" % [
 			multiplayer.get_rpc_sender_id(), user.peer_id])
+		return
+	if user.using != object_tile:
+		Log.error("Peer %d is not using this simulator..." % [user.peer_id])
 		return
 	
 	var result = yield(Connection.request(
@@ -52,6 +69,9 @@ master func _join_game(
 	if user.peer_id != multiplayer.get_rpc_sender_id():
 		Log.error("Peer %d tried to act as %d" % [
 			multiplayer.get_rpc_sender_id(), user.peer_id])
+		return
+	if user.using != object_tile:
+		Log.error("Peer %d is not using this simulator..." % [user.peer_id])
 		return
 	
 	var result = yield(Connection.request(

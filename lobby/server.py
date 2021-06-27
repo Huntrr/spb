@@ -30,8 +30,9 @@ def list_games(_) -> flask.Response:
     start_idx = offset
     end_idx = offset + LOBBIES_PER_PAGE
 
-    lobbies = lobby.Lobby.objects(
-        state=lobby.State.PREGAME).order_by('+created_at')[start_idx:end_idx]
+    lobbies = lobby.Lobby \
+        .objects(state=lobby.State.PREGAME, n_users__gt=0) \
+        .order_by('+created_at')[start_idx:end_idx]
     lobbies = [the_lobby.to_dict() for the_lobby in lobbies]
     return dict(lobbies=lobbies, next_offset=end_idx)
 
@@ -85,8 +86,10 @@ def leave_game(_) -> flask.Response:
 
     the_user = mongo.get_object(user.User, user_id)
     the_lobby = the_user.current_lobby
-    the_lobby.remove_user(the_user)
-    return the_lobby.to_dict()
+    if the_lobby:
+        the_lobby.remove_user(the_user)
+        return the_lobby.to_dict()
+    return {}
 
 @app.route('/kick_user', methods=['POST'])
 @flask_utils.server_required
