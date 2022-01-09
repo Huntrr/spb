@@ -1,3 +1,7 @@
+Werkzeug==1.0.1
+# Usage: General web utils.
+# License BSD-3-Clause
+
 absl-py==0.11.0
 # Usage: Flags and logging.
 # License: Apache 2.0
